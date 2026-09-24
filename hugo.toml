@@ -22,6 +22,12 @@ copyright = "© 2026 Londopy · Posts [CC BY 4.0](https://creativecommons.org/li
   # dev.to's "Publishing to DEV from RSS" imports whatever the feed carries,
   # so ship whole posts, not summaries.
   ShowFullTextinRSS = true
+  # Social card for pages without a cover (scripts/make_cover.py --site).
+  images = ["og-image.png"]
+
+[params.label]
+  icon = "favicon.svg"
+  iconHeight = 28
 
 [params.homeInfoParams]
   Title = "Londopy"
@@ -29,19 +35,27 @@ copyright = "© 2026 Londopy · Posts [CC BY 4.0](https://creativecommons.org/li
 
 [[params.socialIcons]]
   name = "github"
+  title = "GitHub"
   url = "https://github.com/Londopy"
 
 [[params.socialIcons]]
+  name = "email"
+  title = "Contact"
+  url = "https://londopy.github.io/blog/contact/"
+
+[[params.socialIcons]]
   name = "rss"
+  title = "RSS"
   url = "https://londopy.github.io/blog/index.xml"
 
-# PaperMod links all five of these from <head>; the files live in static/.
+# PaperMod links all five of these from <head>; the files live in static/
+# and come from scripts/make_icons.py.
 [params.assets]
   favicon = "favicon.ico"
   favicon16x16 = "favicon-16x16.png"
   favicon32x32 = "favicon-32x32.png"
   apple_touch_icon = "apple-touch-icon.png"
-  safari_pinned_tab = "favicon.svg"
+  safari_pinned_tab = "safari-pinned-tab.svg"
 
 # pageRef (not url) so the links keep the /blog/ prefix.
 [[menus.main]]
@@ -64,6 +78,11 @@ copyright = "© 2026 Londopy · Posts [CC BY 4.0](https://creativecommons.org/li
   name = "About"
   pageRef = "/about"
   weight = 40
+
+[[menus.main]]
+  name = "Contact"
+  pageRef = "/contact"
+  weight = 45
 
 [[menus.main]]
   name = "Projects"
