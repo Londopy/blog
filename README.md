@@ -28,9 +28,10 @@ deploy workflow. If you cloned without `--recurse-submodules`, run
    with hyphens. New posts start as `draft: true`.
 2. Fill in `description` (required: it becomes the search and social preview)
    and `tags`.
-3. Make the cover: `python scripts/make_cover.py content/posts/<slug>`. Add
-   `--file NAME --snippet` to show the post's first code block instead of the
-   description. Needs Pillow.
+3. Make the cover: `python scripts/make_cover.py content/posts/<slug>`. To put
+   terminal lines on the card instead of the description, add them to
+   `scripts/covers.json` under the slug first (`$ ` lines are commands, the
+   rest is output, five lines at most). Needs Pillow.
 4. Strip metadata from every image in the bundle, since photos can carry GPS
    and device info:
    `exiftool -all= -overwrite_original content/posts/<slug>/*.png`
@@ -57,10 +58,10 @@ rebuilt after a design change:
   pinned-tab mask, the Apple touch icon, and the Android icons that
   `static/site.webmanifest` lists. They reproduce the `>_` mark from
   londopy.github.io, traced from JetBrains Mono Bold.
-- `python scripts/make_cover.py --site` writes `static/og-image.png`, the
-  social card for pages without a cover.
-- `python scripts/make_cover.py content/posts/<slug>` writes a post's
-  `cover.png`.
+- `python scripts/make_cover.py --all` writes every post's `cover.png` (using
+  the lines in `scripts/covers.json`) and `static/og-image.png`, the social
+  card for pages without a cover. `--site` or a single post directory
+  rebuilds just that one.
 
 Both scripts need Pillow, and `make_icons.py` also needs fontTools
 (`pip install pillow fonttools`) and the JetBrains Mono font.

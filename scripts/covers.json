@@ -1,0 +1,33 @@
+{
+  "gitattributes": [
+    "$ cat .gitattributes",
+    "*.sh    text eol=lf",
+    "*.png   binary",
+    "docs/** linguist-documentation"
+  ],
+  "git-worktree": [
+    "$ git worktree add ../myproject-hotfix hotfix",
+    "$ git worktree list",
+    "/home/you/myproject         3f2a91c [feature]",
+    "/home/you/myproject-hotfix  8d0c4e7 [hotfix]"
+  ],
+  "git-bisect-run": [
+    "$ git bisect start HEAD v2.3.0",
+    "$ git bisect run ./check.sh",
+    "Bisecting: 199 revisions left to test after this (roughly 8 steps)",
+    "a1b2c3d is the first bad commit"
+  ],
+  "git-internals": [
+    "$ echo \"hello\" | git hash-object --stdin",
+    "ce013625030ba8dba906f756967f9e9ca394464a",
+    "$ git cat-file -p ce0136",
+    "hello"
+  ],
+  "github-actions-beyond-ci": [
+    "$ cat .github/workflows/weekly.yml",
+    "on:",
+    "  schedule:",
+    "    - cron: \"0 14 * * 1\"",
+    "  workflow_dispatch:"
+  ]
+}

@@ -4,22 +4,24 @@
 Same look as the Open Graph cards on londopy.github.io, so a shared post and
 a shared project read as one site.
 
+    python scripts/make_cover.py --all
     python scripts/make_cover.py content/posts/<slug>
-    python scripts/make_cover.py content/posts/<slug> --file .gitattributes --snippet
     python scripts/make_cover.py --site
 
-A post card is written to the bundle as cover.png. Its title, description and
-tags come from the post's front matter. --snippet prints the post's first
-code block under the prompt instead of the description; --file sets what the
-prompt cats (default: <slug>.md).
+A post card is written to the bundle as cover.png. Its title and tags come
+from the post's front matter. The terminal above the title shows the post's
+lines from scripts/covers.json ("$ " lines are commands, the rest output),
+or, for a post with no entry there, `cat <slug>.md` and the description.
 
 --site writes static/og-image.png, the card for every page without a cover
-(home, about, contact, search, archive, tags).
+(home, about, contact, search, archive, tags). --all writes every post card
+and the site card.
 
 Requires Pillow. Strip metadata before committing anyway:
     exiftool -all= -overwrite_original content/posts/<slug>/cover.png
 """
 import argparse
+import json
 import os
 import re
 from PIL import Image, ImageDraw, ImageFont
@@ -42,6 +44,10 @@ PX, PY, PW, PH = 80, 82, 1040, 466
 LEFT = 130
 MAX_W = PW - 120
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+POSTS = os.path.join(ROOT, "content", "posts")
+MANIFEST = os.path.join(ROOT, "scripts", "covers.json")
+PROMPT = [("londopy", ACCENT), ("@", FAINT), ("github", TEXT), (":~$", FAINT)]
+MAX_LINES = 5   # prompt + 4; more would push the tags out of the window
 
 
 def find_font(candidates):
@@ -84,11 +90,6 @@ def front_matter(md):
     tags = re.search(r"^tags:\s*\[(.*)\]", fm, re.M)
     tags = [t.strip().strip("\"'") for t in tags.group(1).split(",")] if tags else []
     return scalar("title"), scalar("description"), [t for t in tags if t]
-
-
-def first_code_block(md):
-    m = re.search(r"^```(\w*)\n(.*?)\n```$", md, re.S | re.M)
-    return (m.group(1), m.group(2).split("\n")) if m else ("", [])
 
 
 def base_card():
@@ -166,26 +167,62 @@ def gitattributes_parts(line):
     return parts
 
 
-def cover(post_dir, file_name, snippet):
+def yaml_parts(line):
+    """Color one YAML line: keys, then plain or quoted values."""
+    m = re.match(r"^(\s*)(- )?([\w-]+)(:)(.*)$", line)
+    if not m:
+        return [(line, TEXT)]
+    indent, dash, key, colon, rest = m.groups()
+    value = DIM if rest.strip().startswith(('"', "'")) else TEXT
+    return [p for p in [(indent, TEXT), (dash or "", FAINT), (key, ACCENT),
+                        (colon, FAINT), (rest, value)] if p[0]]
+
+
+def output_parts(line, cat):
+    """Color a line of command output; `cat` is the file the last command printed."""
+    if cat.endswith(".gitattributes"):
+        return gitattributes_parts(line)
+    if cat.endswith((".yml", ".yaml")):
+        return yaml_parts(line)
+    parts, pos = [], 0
+    for m in re.finditer(r"\b[0-9a-f]{7,40}\b|\[[^\]]*\]", line):   # hashes, [branch]
+        parts += [(line[pos:m.start()], TEXT),
+                  (m.group(), DIM if m.group().startswith("[") else ACCENT)]
+        pos = m.end()
+    parts.append((line[pos:], TEXT))
+    return [p for p in parts if p[0]]
+
+
+def terminal(d, lines, slug):
+    """Draw terminal lines under the title bar and return the y below them."""
+    if len(lines) > MAX_LINES:
+        raise SystemExit(f"{slug}: {len(lines)} cover lines, the card fits {MAX_LINES}")
+    fp = ImageFont.truetype(MONO, 22)
+    y, cat = 158, ""
+    for i, line in enumerate(lines):
+        if line.startswith("$ "):
+            cmd = line[2:]
+            parts = PROMPT + [(f"  {cmd}", DIM)]
+            cat = cmd[4:] if cmd.startswith("cat ") else ""
+        else:
+            parts = output_parts(line, cat)
+        if LEFT + sum(d.textlength(t, fp) for t, _ in parts) > PX + PW - 40:
+            raise SystemExit(f"{slug}: cover line too wide for the card: {line!r}")
+        segments(d, LEFT, y, parts, fp)
+        y = 200 if i == 0 else y + 34
+    return y
+
+
+def cover(post_dir, lines):
     md = open(os.path.join(post_dir, "index.md"), encoding="utf-8").read().replace("\r\n", "\n")
     title, description, tags = front_matter(md)
     slug = os.path.basename(os.path.normpath(post_dir))
 
     img, d = base_card()
-    fp = ImageFont.truetype(MONO, 22)
-    segments(d, LEFT, 158, [
-        ("londopy", ACCENT), ("@", FAINT), ("github", TEXT), (":~$", FAINT),
-        (f"  cat {file_name or slug + '.md'}", DIM),
-    ], fp)
-
-    y = 200
-    lang, code = first_code_block(md) if snippet else ("", [])
-    if code:
-        for line in code[:4]:
-            parts = gitattributes_parts(line) if lang == "gitattributes" else [(line, TEXT)]
-            segments(d, LEFT, y, parts, fp)
-            y += 34
-    elif description:
+    if lines:
+        y = terminal(d, lines, slug)
+    else:
+        y = terminal(d, [f"$ cat {slug}.md"], slug)
         fd = ImageFont.truetype(SANS, 24)
         for line in wrap(d, description, fd, MAX_W, 3):
             d.text((LEFT + 2, y), line, font=fd, fill=DIM)
@@ -220,10 +257,7 @@ def cover(post_dir, file_name, snippet):
 def site_card():
     """The card for pages without a cover: the blog's own title card."""
     img, d = base_card()
-    segments(d, LEFT, 172, [
-        ("londopy", ACCENT), ("@", FAINT), ("github", TEXT), (":~$", FAINT),
-        ("  ls ~/blog/posts", DIM),
-    ], ImageFont.truetype(MONO, 24))
+    segments(d, LEFT, 172, PROMPT + [("  ls ~/blog/posts", DIM)], ImageFont.truetype(MONO, 24))
 
     segments(d, LEFT - 4, 218, [("Londopy", TEXT), ("/blog", ACCENT)],
              ImageFont.truetype(MONO_B, 58))
@@ -244,18 +278,29 @@ def site_card():
     print(f"wrote {out}")
 
 
+def manifest():
+    with open(MANIFEST, encoding="utf-8") as f:
+        return json.load(f)
+
+
 if __name__ == "__main__":
     ap = argparse.ArgumentParser(description="Render social cards")
     ap.add_argument("post_dir", nargs="?", help="page bundle, e.g. content/posts/<slug>")
-    ap.add_argument("--file", help="what the prompt cats (default: <slug>.md)")
-    ap.add_argument("--snippet", action="store_true",
-                    help="show the first code block instead of the description")
     ap.add_argument("--site", action="store_true",
                     help="write static/og-image.png instead of a post cover")
+    ap.add_argument("--all", action="store_true",
+                    help="write every post cover and the site card")
     a = ap.parse_args()
-    if a.site:
+    if a.all:
+        covers = manifest()
+        for slug in sorted(os.listdir(POSTS)):
+            if os.path.exists(os.path.join(POSTS, slug, "index.md")):
+                cover(os.path.join(POSTS, slug), covers.get(slug))
+        site_card()
+    elif a.site:
         site_card()
     elif a.post_dir:
-        cover(a.post_dir, a.file, a.snippet)
+        slug = os.path.basename(os.path.normpath(a.post_dir))
+        cover(a.post_dir, manifest().get(slug))
     else:
-        ap.error("give a post directory or --site")
+        ap.error("give a post directory, --site or --all")
