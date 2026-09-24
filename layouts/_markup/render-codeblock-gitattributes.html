@@ -1,0 +1,42 @@
+{{- /*
+  Chroma has no .gitattributes lexer, so fences tagged `gitattributes` are
+  tokenized here and emitted with Chroma's class names. The colors then come
+  from the same stylesheet as every other code block, and PaperMod's copy
+  button finds the block the same way.
+
+    # comment              c1
+    [attr]name             k + nf   (macro definition)
+    pattern                s
+    attr, -attr, !attr     na, with the prefix as o
+    attr=value             na o l
+*/ -}}
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-gitattributes" data-lang="gitattributes">
+{{- range split (strings.TrimSuffix "\n" .Inner) "\n" -}}
+<span class="line"><span class="cl">
+  {{- if hasPrefix (strings.TrimSpace .) "#" -}}
+    <span class="c1">{{ . }}</span>
+  {{- else -}}
+    {{- $first := true -}}
+    {{- range findRE `\s+|\S+` . -}}
+      {{- if eq (strings.TrimSpace .) "" -}}
+        {{ . }}
+      {{- else if $first -}}
+        {{- $first = false -}}
+        {{- if hasPrefix . "[attr]" -}}
+          <span class="k">[attr]</span><span class="nf">{{ strings.TrimPrefix "[attr]" . }}</span>
+        {{- else -}}
+          <span class="s">{{ . }}</span>
+        {{- end -}}
+      {{- else if or (hasPrefix . "-") (hasPrefix . "!") -}}
+        <span class="o">{{ substr . 0 1 }}</span><span class="na">{{ substr . 1 }}</span>
+      {{- else if in . "=" -}}
+        {{- $kv := split . "=" -}}
+        <span class="na">{{ index $kv 0 }}</span><span class="o">=</span><span class="l">{{ delimit (after 1 $kv) "=" }}</span>
+      {{- else -}}
+        <span class="na">{{ . }}</span>
+      {{- end -}}
+    {{- end -}}
+  {{- end -}}
+{{ "\n" }}</span></span>
+{{- end -}}
+</code></pre></div>
