@@ -47,6 +47,24 @@ social preview points at `/blog/cover.png` and 404s.
 Chroma has no lexer for `.gitattributes`, so fences tagged `gitattributes` are
 highlighted by `layouts/_markup/render-codeblock-gitattributes.html`.
 
+## Assets
+
+Every image the site serves comes from a script, so the whole set can be
+rebuilt after a design change:
+
+- `python scripts/make_icons.py` writes the favicons (`.ico`, 16 and 32 px
+  PNGs, and `favicon.svg`, which is also the header logo), the Safari
+  pinned-tab mask, the Apple touch icon, and the Android icons that
+  `static/site.webmanifest` lists. They reproduce the `>_` mark from
+  londopy.github.io, traced from JetBrains Mono Bold.
+- `python scripts/make_cover.py --site` writes `static/og-image.png`, the
+  social card for pages without a cover.
+- `python scripts/make_cover.py content/posts/<slug>` writes a post's
+  `cover.png`.
+
+Both scripts need Pillow, and `make_icons.py` also needs fontTools
+(`pip install pillow fonttools`) and the JetBrains Mono font.
+
 ## Deploying
 
 Every push to `main` builds the site and deploys it to Pages
