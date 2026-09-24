@@ -1,0 +1,80 @@
+baseURL = "https://londopy.github.io/blog/"
+locale = "en-us"
+title = "Londopy"
+theme = "PaperMod"
+enableRobotsTXT = true
+copyright = "© 2026 Londopy · Posts [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/) · Code [MIT](https://github.com/Londopy/blog/blob/main/LICENSE)"
+
+[taxonomies]
+  tag = "tags"
+
+[params]
+  author = "Londopy"
+  description = "Notes on security, systems, radio, and building things."
+  defaultTheme = "auto"
+  mainSections = ["posts"]
+  ShowReadingTime = true
+  ShowCodeCopyButtons = true
+  ShowToc = true
+  ShowPostNavLinks = true
+  ShowShareButtons = false
+  ShowRssButtonInSectionTermList = true
+  # dev.to's "Publishing to DEV from RSS" imports whatever the feed carries,
+  # so ship whole posts, not summaries.
+  ShowFullTextinRSS = true
+
+[params.homeInfoParams]
+  Title = "Londopy"
+  Content = "Notes on security, systems, radio, and building things."
+
+[[params.socialIcons]]
+  name = "github"
+  url = "https://github.com/Londopy"
+
+[[params.socialIcons]]
+  name = "rss"
+  url = "https://londopy.github.io/blog/index.xml"
+
+# PaperMod links all five of these from <head>; the files live in static/.
+[params.assets]
+  favicon = "favicon.ico"
+  favicon16x16 = "favicon-16x16.png"
+  favicon32x32 = "favicon-32x32.png"
+  apple_touch_icon = "apple-touch-icon.png"
+  safari_pinned_tab = "favicon.svg"
+
+# pageRef (not url) so the links keep the /blog/ prefix.
+[[menus.main]]
+  name = "Archive"
+  pageRef = "/archives"
+  weight = 10
+
+[[menus.main]]
+  name = "Tags"
+  pageRef = "/tags"
+  weight = 20
+
+[[menus.main]]
+  identifier = "search"
+  name = "Search"
+  pageRef = "/search"
+  weight = 30
+
+[[menus.main]]
+  name = "About"
+  pageRef = "/about"
+  weight = 40
+
+[[menus.main]]
+  name = "Projects"
+  url = "https://londopy.github.io/"
+  weight = 50
+
+[outputs]
+  home = ["HTML", "RSS", "JSON"]    # JSON powers PaperMod search
+
+# With noClasses = false the colors come from CSS, not from `style`:
+# assets/css/includes/chroma-styles.css is `hugo gen chromastyles --style=monokai`.
+[markup.highlight]
+  noClasses = false
+  style = "monokai"
