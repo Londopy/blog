@@ -1,7 +1,7 @@
 ---
 title: "A Beginner's Map of OT and ICS Security"
-date: 2026-09-24T12:00:00-07:00
-draft: true
+date: 2026-10-29T09:00:00-07:00
+draft: false
 description: "Power grids, water plants, and factories run on computers that play by different rules than office IT. Here's a map of the field for anyone curious about getting into it, from someone heading that way."
 tags: ["ot-security", "ics", "scada", "cybersecurity", "careers"]
 author: "Londopy"
@@ -69,7 +69,7 @@ You don't need to memorize these, but you'll see them everywhere.
 
 - **Free training:** CISA offers free online ICS security training.
 - **Simulate a plant:** OpenPLC is a free, open-source PLC you can run on a computer or a Raspberry Pi, and program in the same languages real PLCs use.
-- **Real hardware:** entry-level PLCs are surprisingly affordable. [TODO: add your own lab once it exists]
+- **Real hardware:** entry-level PLCs are surprisingly affordable, but you don't need one to start. OpenPLC on a Raspberry Pi as the controller, an open-source HMI like FUXA on a laptop, and Wireshark on the link between them make a small plant network you can break and fix safely.
 - **Watch traffic:** capture Modbus or other industrial protocols with Wireshark and see how they work. Tools like Zeek and Suricata can monitor OT traffic for anomalies.
 - **Community:** the ICS Village at security conferences, and SANS's free ICS resources and webcasts.
 
@@ -77,7 +77,7 @@ You don't need to memorize these, but you'll see them everywhere.
 
 One thing surprised me: many OT security professionals come from **engineering and controls backgrounds**, not IT security. It's often easier to teach a controls engineer threat modeling than to teach a security analyst how a plant actually runs, how a turbine behaves, or why you never casually reboot a PLC.
 
-That's my plan: start in the field on real industrial systems, then move into securing them. [TODO: expand with your own path, at whatever level of detail you're comfortable sharing publicly]
+That's my plan: start in the field on real industrial systems, then move into securing them. I'm studying engineering with a focus on field work, and taking cybersecurity courses alongside it, so I'll know how the equipment behaves before I learn how to defend it.
 
 ## Closing thought
 
