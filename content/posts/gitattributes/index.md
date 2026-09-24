@@ -195,7 +195,7 @@ tests/         export-ignore
 VERSION        export-subst
 ```
 
-`export-ignore` leaves files out of release archives. GitHub's "Download ZIP" and release source tarballs respect this too.
+`export-ignore` leaves files out of release archives. GitHub's "Download ZIP" and release source tarballs respect this too. It's also one of the few attributes where a directory pattern like `tests/` works, because `git archive` checks each directory as it walks the tree.
 
 `export-subst` expands placeholders at archive time. Put this in `VERSION`:
 
@@ -239,6 +239,8 @@ Markdown uses two trailing spaces as a line break, so you don't want those flagg
 *.ps1 working-tree-encoding=UTF-16LE eol=crlf
 ```
 
+Only use it on files that really are UTF-16. With this line, `git add` refuses a `.ps1` saved with a byte order mark (declare `UTF-16LE-BOM` for those) and one saved as UTF-8, which is what most editors write today.
+
 **`-delta`** skips delta compression for huge binaries that don't compress well anyway, which speeds up packing:
 
 ```gitattributes
@@ -258,7 +260,7 @@ Markdown uses two trailing spaces as a line break, so you don't want those flagg
 In the top-level `.gitattributes` only, you can define your own bundles of attributes:
 
 ```gitattributes
-[attr]lockfile -diff merge=ours linguist-generated
+[attr]lockfile -diff linguist-generated
 
 package-lock.json lockfile
 yarn.lock         lockfile
@@ -266,6 +268,8 @@ Cargo.lock        lockfile
 ```
 
 One name, one place to change it later.
+
+**Know this:** don't put `merge=ours` in a macro like this. When both branches add a dependency, the merge succeeds without a conflict and the lockfile quietly loses the other branch's entries. Regenerate lockfiles after a merge instead.
 
 ## A sane starter file
 

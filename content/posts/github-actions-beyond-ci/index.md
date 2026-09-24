@@ -68,7 +68,7 @@ jobs:
   update:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - run: ./scripts/update-readme.sh
       - run: |
           git config user.name "github-actions[bot]"
@@ -105,7 +105,7 @@ GitHub isn't built for real-time monitoring, but for "check once an hour and tel
 
 ## 7. Trigger workflows from outside GitHub
 
-With `repository_dispatch`, anything that can make an HTTP request can start a workflow: a script on your server, a webhook from another service, a phone shortcut.
+With `repository_dispatch`, anything that can send an HTTP request with a GitHub token can start a workflow: a script on your server, a webhook from another service, a phone shortcut. The token needs write access to the repo, so treat it like a password.
 
 ```yaml
 on:

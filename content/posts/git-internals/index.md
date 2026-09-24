@@ -190,7 +190,7 @@ This is how you recover from almost anything: a bad reset, a deleted branch, a r
 git branch rescue <hash>
 ```
 
-Unreachable objects are only deleted by garbage collection after a grace period (two weeks by default for loose objects, and reflog entries last about 90 days). You have time.
+Unreachable objects are only deleted by garbage collection after a grace period (two weeks by default for loose objects). Reflog entries last 90 days, but only 30 for commits that are no longer on any branch, which is what a bad reset or rebase leaves behind. You have time.
 
 ## Build a commit with no porcelain
 
@@ -207,12 +207,13 @@ git commit-tree <tree-hash> -p HEAD -m "a commit made by hand"
 git update-ref refs/heads/main <commit-hash>
 ```
 
-Run `git log`. Your hand-built commit is there, indistinguishable from any other. Every friendly Git command is built from pieces like these.
+Run `git log`. Your hand-built commit is there, indistinguishable from any other. (`git status` will call `handmade.txt` deleted, because so far the file only exists in the repo. `git restore handmade.txt` writes it out.) Every friendly Git command is built from pieces like these.
 
 ## Things you should know
 
 - **Don't edit `.git` by hand in real repos.** Explore in a throwaway one.
 - **SHA-256 repos exist.** Git supports `git init --object-format=sha256`, which gives 64-character hashes. The structure is the same.
+- **Refs won't always be files.** Git 3.0 will switch new repos to the reftable format, and you can try it today with `git init --ref-format=reftable`. There, branches live in binary tables under `.git/reftable/`, and `.git/HEAD` just says `ref: refs/heads/.invalid`. Commands like `git branch` and `git rev-parse` work the same either way.
 - **Hashes include everything.** Change one byte of a file, one character of a commit message, or a timestamp, and the hash changes, along with every commit after it. That's why rewriting history changes all later commit IDs.
 
 ## Closing thought

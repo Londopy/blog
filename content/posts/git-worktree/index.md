@@ -104,9 +104,13 @@ Some people go further: they clone a repo as *bare* (no working files at all) an
 git clone --bare git@github.com:you/project.git project/.bare
 cd project
 echo "gitdir: ./.bare" > .git
+git config remote.origin.fetch "+refs/heads/*:refs/remotes/origin/*"
+git fetch
 git worktree add main
 git worktree add feature-x
 ```
+
+The `git config` line matters. A bare clone doesn't set up remote-tracking branches, so without it, `git fetch` quietly never updates them.
 
 Now every branch you work on is a tidy subfolder of `project/`. It takes a little getting used to, but it makes "which branch am I on?" a question your file manager answers.
 
