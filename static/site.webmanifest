@@ -1,0 +1,14 @@
+{
+  "name": "Londopy",
+  "short_name": "Londopy",
+  "description": "Notes on security, systems, radio, and building things.",
+  "start_url": "/blog/",
+  "scope": "/blog/",
+  "display": "minimal-ui",
+  "background_color": "#0a0e13",
+  "theme_color": "#2e2e33",
+  "icons": [
+    { "src": "android-chrome-192x192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "android-chrome-512x512.png", "sizes": "512x512", "type": "image/png" }
+  ]
+}

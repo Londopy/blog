@@ -1,15 +1,20 @@
 #!/usr/bin/env python3
-"""Generate a post's cover.png (1200x630) as a terminal-window card.
+"""Generate social cards (1200x630) as terminal-window cards.
 
 Same look as the Open Graph cards on londopy.github.io, so a shared post and
 a shared project read as one site.
 
     python scripts/make_cover.py content/posts/<slug>
     python scripts/make_cover.py content/posts/<slug> --file .gitattributes --snippet
+    python scripts/make_cover.py --site
 
-The title, description and tags come from the post's front matter. --snippet
-prints the post's first code block under the prompt instead of the
-description; --file sets what the prompt cats (default: <slug>.md).
+A post card is written to the bundle as cover.png. Its title, description and
+tags come from the post's front matter. --snippet prints the post's first
+code block under the prompt instead of the description; --file sets what the
+prompt cats (default: <slug>.md).
+
+--site writes static/og-image.png, the card for every page without a cover
+(home, about, contact, search, archive, tags).
 
 Requires Pillow. Strip metadata before committing anyway:
     exiftool -all= -overwrite_original content/posts/<slug>/cover.png
@@ -36,6 +41,7 @@ NEUTRAL = "#3a4a5a"
 PX, PY, PW, PH = 80, 82, 1040, 466
 LEFT = 130
 MAX_W = PW - 120
+ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 
 def find_font(candidates):
@@ -99,6 +105,13 @@ def base_card():
     for i, c in enumerate([RED, AMBER, NEUTRAL]):
         cx = PX + 32 + i * 24
         d.ellipse([cx - 7, PY + 17, cx + 7, PY + 31], fill=c)
+
+    ft = ImageFont.truetype(MONO, 16)
+    bar = "londopy@github: ~/blog"
+    d.text((PX + PW / 2 - d.textlength(bar, ft) / 2, PY + 15), bar, font=ft, fill=FAINT)
+    fu = ImageFont.truetype(MONO, 22)
+    u = "londopy.github.io/blog"
+    d.text((W / 2 - d.textlength(u, fu) / 2, 582), u, font=fu, fill=ACCENT)
     return img, d
 
 
@@ -159,10 +172,6 @@ def cover(post_dir, file_name, snippet):
     slug = os.path.basename(os.path.normpath(post_dir))
 
     img, d = base_card()
-    ft = ImageFont.truetype(MONO, 16)
-    bar = "londopy@github: ~/blog"
-    d.text((PX + PW / 2 - d.textlength(bar, ft) / 2, PY + 15), bar, font=ft, fill=FAINT)
-
     fp = ImageFont.truetype(MONO, 22)
     segments(d, LEFT, 158, [
         ("londopy", ACCENT), ("@", FAINT), ("github", TEXT), (":~$", FAINT),
@@ -203,20 +212,50 @@ def cover(post_dir, file_name, snippet):
             segments(d, x, y + 14, [("#", ACCENT), (t, FAINT)], fg)
             x += w + 26
 
-    fu = ImageFont.truetype(MONO, 22)
-    u = "londopy.github.io/blog"
-    d.text((W / 2 - d.textlength(u, fu) / 2, 582), u, font=fu, fill=ACCENT)
-
     out = os.path.join(post_dir, "cover.png")
     img.save(out, optimize=True)
     print(f"wrote {out}")
 
 
+def site_card():
+    """The card for pages without a cover: the blog's own title card."""
+    img, d = base_card()
+    segments(d, LEFT, 172, [
+        ("londopy", ACCENT), ("@", FAINT), ("github", TEXT), (":~$", FAINT),
+        ("  ls ~/blog/posts", DIM),
+    ], ImageFont.truetype(MONO, 24))
+
+    segments(d, LEFT - 4, 218, [("Londopy", TEXT), ("/blog", ACCENT)],
+             ImageFont.truetype(MONO_B, 58))
+
+    fs = ImageFont.truetype(SANS, 29)
+    segments(d, LEFT, 312, [
+        ("Notes on ", DIM), ("security", ACCENT), (", ", DIM),
+        ("systems", ACCENT), (", ", DIM), ("radio", ACCENT), (",", DIM),
+    ], fs)
+    segments(d, LEFT, 352, [("and ", DIM), ("building things", ACCENT), (".", DIM)], fs)
+
+    segments(d, LEFT + 2, 440, [
+        ("posts publish here first · full-text RSS ", FAINT), ("▌", ACCENT),
+    ], ImageFont.truetype(MONO, 19))
+
+    out = os.path.join(ROOT, "static", "og-image.png")
+    img.save(out, optimize=True)
+    print(f"wrote {out}")
+
+
 if __name__ == "__main__":
-    ap = argparse.ArgumentParser(description="Render a post's cover.png")
-    ap.add_argument("post_dir", help="page bundle, e.g. content/posts/<slug>")
+    ap = argparse.ArgumentParser(description="Render social cards")
+    ap.add_argument("post_dir", nargs="?", help="page bundle, e.g. content/posts/<slug>")
     ap.add_argument("--file", help="what the prompt cats (default: <slug>.md)")
     ap.add_argument("--snippet", action="store_true",
                     help="show the first code block instead of the description")
+    ap.add_argument("--site", action="store_true",
+                    help="write static/og-image.png instead of a post cover")
     a = ap.parse_args()
-    cover(a.post_dir, a.file, a.snippet)
+    if a.site:
+        site_card()
+    elif a.post_dir:
+        cover(a.post_dir, a.file, a.snippet)
+    else:
+        ap.error("give a post directory or --site")
