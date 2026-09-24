@@ -3,6 +3,12 @@ name: Deploy Hugo site to Pages
 on:
   push:
     branches: [main]
+  # Daily rebuild: Hugo skips posts dated in the future, so this is what
+  # publishes a scheduled post on its date. 17:30 UTC is 10:30 PDT / 09:30 PST,
+  # so a post dated 09:00 Pacific goes up the same morning all year, and it
+  # stays off the top of the hour, when GitHub's scheduler is busiest.
+  schedule:
+    - cron: "30 17 * * *"
   workflow_dispatch:
 
 permissions:

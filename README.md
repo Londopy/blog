@@ -37,9 +37,10 @@ deploy workflow. If you cloned without `--recurse-submodules`, run
    `exiftool -all= -overwrite_original content/posts/<slug>/*.png`
    (and `*.jpg`).
 5. Preview with `hugo server -D -F` on desktop and phone.
-6. To publish, set `date` to the actual publish time, set `draft: false`, then
-   commit and push. Hugo skips posts dated in the future, and nothing rebuilds
-   on its own when that date arrives.
+6. To publish, set `draft: false`, then commit and push. The `date` decides
+   when the post appears: a date that has passed goes live with the push, and
+   a future date goes live with the first daily rebuild on or after it (see
+   Deploying). That's how to schedule a post.
 
 Images live next to the post in its page bundle. Keep `cover.relative: true`
 in the front matter: PaperMod builds `og:image` from it, and without it the
@@ -71,6 +72,14 @@ Both scripts need Pillow, and `make_icons.py` also needs fontTools
 Every push to `main` builds the site and deploys it to Pages
 (`.github/workflows/deploy.yml`). The Pages source is set to "GitHub Actions"
 in the repo settings. Drafts never build in production.
+
+The same workflow also rebuilds the site every day at 17:30 UTC (10:30 PDT,
+09:30 PST). Hugo leaves out posts dated in the future, so that daily run is
+what publishes a scheduled post: one dated 09:00 Pacific goes up the same
+morning. GitHub pauses scheduled workflows in public repos after 60 days
+without repository activity; if that happens, re-enable it from the Actions
+tab. To see what a given day's build will contain, run
+`hugo --clock 2026-10-01T17:30:00Z` locally.
 
 Versions are pinned: Hugo in the workflow (`hugo-version`) and the theme by its
 submodule commit. To upgrade either, bump it, check `hugo server` locally, and
