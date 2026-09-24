@@ -1,7 +1,7 @@
 ---
 title: "The Best Git Feature You've Never Used"
-date: 2026-09-24T12:00:00-07:00
-draft: true
+date: 2026-09-24T01:50:00-07:00
+draft: false
 description: "Every repo has a .gitignore. Almost nobody has a .gitattributes. Here's everything it can do: line endings, smarter diffs, merge strategies, filters, release archives, and GitHub extras."
 tags: ["git", "github", "gitattributes", "tooling", "devops"]
 author: "Londopy"

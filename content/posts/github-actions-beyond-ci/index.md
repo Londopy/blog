@@ -1,7 +1,7 @@
 ---
 title: "Things GitHub Actions Can Do That Aren't CI"
-date: 2026-09-24T12:00:00-07:00
-draft: true
+date: 2026-10-22T09:00:00-07:00
+draft: false
 description: "GitHub Actions is a free, event-driven computer attached to every repo. Running tests is just the start."
 tags: ["github", "github-actions", "automation"]
 author: "Londopy"

@@ -1,7 +1,7 @@
 ---
 title: "Your .git Folder Is a Database. Let's Read It."
-date: 2026-09-24T12:00:00-07:00
-draft: true
+date: 2026-10-15T09:00:00-07:00
+draft: false
 description: "Git isn't magic. It's a small, clever key-value store with a few text files on top. Here's how to explore it by hand."
 tags: ["git", "internals", "deep-dive"]
 author: "Londopy"

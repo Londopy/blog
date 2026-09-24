@@ -1,7 +1,7 @@
 ---
 title: "git bisect run: Let Git Find the Bug for You"
-date: 2026-09-24T12:00:00-07:00
-draft: true
+date: 2026-10-08T09:00:00-07:00
+draft: false
 description: "Something broke, and you don't know which of the last 400 commits did it. Git can binary-search your history and find the exact commit, automatically."
 tags: ["git", "debugging", "tooling"]
 author: "Londopy"

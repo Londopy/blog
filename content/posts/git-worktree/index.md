@@ -1,7 +1,7 @@
 ---
 title: "git worktree: Stop Stashing, Start Branching in Parallel"
-date: 2026-09-24T12:00:00-07:00
-draft: true
+date: 2026-10-01T09:00:00-07:00
+draft: false
 description: "Check out multiple branches at the same time, in separate folders, from one repo. No stash, no second clone, no lost work."
 tags: ["git", "workflow", "tooling"]
 author: "Londopy"
