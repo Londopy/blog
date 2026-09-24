@@ -12,6 +12,7 @@ Notes on security, systems, radio, and building things, written by Londopy.
 - Projects: [londopy.github.io](https://londopy.github.io/)
 - Code: [github.com/Londopy](https://github.com/Londopy)
 - Feed: [RSS](https://londopy.github.io/blog/index.xml)
+- Contact: [message form, IRC, Discord]({{< relref "contact" >}})
 
 Posts publish here first. Copies on other sites link back to the original here.
 
