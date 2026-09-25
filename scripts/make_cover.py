@@ -1,8 +1,10 @@
 #!/usr/bin/env python3
 """Generate social cards (1200x630) as terminal-window cards.
 
-Same look as the Open Graph cards on londopy.github.io, so a shared post and
-a shared project read as one site.
+The window sits on the same amber topographic contours as the background of
+londopy.github.io, so the blog and the portfolio read as one site. Each
+card's terrain is seeded from its slug: different per post, identical on
+every run.
 
     python scripts/make_cover.py --all
     python scripts/make_cover.py content/posts/<slug>
@@ -24,15 +26,15 @@ Requires Pillow. Strip metadata before committing anyway:
 import argparse
 import json
 import os
+import random
 import re
-from PIL import Image, ImageDraw, ImageFont
+from PIL import Image, ImageColor, ImageDraw, ImageFont
 
 W, H = 1200, 630
 BG = "#0a0e13"
 PANEL = "#0f141b"
 TITLEBAR = "#151c25"
 BORDER = "#2c3947"
-GRID = "#131a23"
 TEXT = "#cdd8e3"
 DIM = "#8494a6"
 FAINT = "#56677a"
@@ -49,6 +51,12 @@ POSTS = os.path.join(ROOT, "content", "posts")
 MANIFEST = os.path.join(ROOT, "scripts", "covers.json")
 PROMPT = [("londopy", ACCENT), ("@", FAINT), ("github", TEXT), (":~$", FAINT)]
 MAX_LINES = 5   # prompt + 4; more would push the tags out of the window
+
+# Background, after TopoBackground.astro on londopy.github.io: the same noise
+# octaves, 13 contour levels, amber lines at 9% with every third at 20%.
+TOPO_LEVELS = 13
+TOPO_COLS, TOPO_ROWS = 40, 21       # marching-squares cells, 30 px each
+TOPO_SCALE = 3                      # drawn at 3x and shrunk, for smooth lines
 
 
 def find_font(candidates):
@@ -93,13 +101,89 @@ def front_matter(md):
     return scalar("title"), scalar("description"), [t for t in tags if t]
 
 
-def base_card():
-    img = Image.new("RGB", (W, H), BG)
+def wash(size):
+    """The portfolio's faint glow at the top:
+    radial-gradient(ellipse 90% 55% at 50% -12%, accent at 6%, transparent 70%)."""
+    lw, lh = 240, 126                       # smooth enough to scale up
+    small = Image.new("RGB", (lw, lh))
+    px = small.load()
+    bg, ac = ImageColor.getrgb(BG), ImageColor.getrgb(ACCENT)
+    cx, cy, rx, ry = 0.5 * lw, -0.12 * lh, 0.9 * lw, 0.55 * lh
+    for y in range(lh):
+        for x in range(lw):
+            dist = (((x + 0.5 - cx) / rx) ** 2 + ((y + 0.5 - cy) / ry) ** 2) ** 0.5
+            a = 0.06 * max(0.0, 1 - dist / 0.7)
+            px[x, y] = tuple(round(b + (c - b) * a) for b, c in zip(bg, ac))
+    return small.resize(size, Image.Resampling.BILINEAR)
+
+
+def topo_background(seed):
+    """Contour lines traced with marching squares over three octaves of seeded
+    value noise, the way the londopy.github.io background draws them."""
+    rng = random.Random(seed)
+    smooth = lambda t: t * t * (3 - 2 * t)
+
+    def lattice(gw, gh):
+        return gw, gh, [[rng.random() for _ in range(gw + 1)] for _ in range(gh + 1)]
+
+    def sample(lat, u, v):
+        gw, gh, g = lat
+        x, y = u * gw, v * gh
+        x0, y0 = min(int(x), gw - 1), min(int(y), gh - 1)
+        tx, ty = smooth(x - x0), smooth(y - y0)
+        top = g[y0][x0] + (g[y0][x0 + 1] - g[y0][x0]) * tx
+        bot = g[y0 + 1][x0] + (g[y0 + 1][x0 + 1] - g[y0 + 1][x0]) * tx
+        return top + (bot - top) * ty
+
+    octaves = [(0.55, lattice(6, 3)), (0.3, lattice(12, 6)), (0.15, lattice(24, 12))]
+    cols, rows = TOPO_COLS, TOPO_ROWS
+    vals = [[sum(w * sample(lat, i / cols, j / rows) for w, lat in octaves)
+             for i in range(cols + 1)] for j in range(rows + 1)]
+    lo, hi = min(map(min, vals)), max(map(max, vals))
+    vals = [[(v - lo) / (hi - lo) for v in row] for row in vals]
+
+    s = TOPO_SCALE
+    cw, ch = W * s / cols, H * s / rows
+    base = wash((W * s, H * s)).convert("RGBA")
+    layer = Image.new("RGBA", base.size, (0, 0, 0, 0))
+    d = ImageDraw.Draw(layer)
+    accent = ImageColor.getrgb(ACCENT)
+
+    def cross(ax, ay, av, bx, by, bv, level):
+        t = (level - av) / ((bv - av) or 1e-6)
+        return ax + (bx - ax) * t, ay + (by - ay) * t
+
+    for n in range(1, TOPO_LEVELS + 1):
+        level = n / (TOPO_LEVELS + 1)
+        index = n % 3 == 0                  # the brighter "index" contours
+        fill = accent + (round(255 * (0.20 if index else 0.09)),)
+        width = round(s * (1.4 if index else 1.0))
+        for j in range(rows):
+            for i in range(cols):
+                x, y = i * cw, j * ch
+                tl, tr, br, bl = vals[j][i], vals[j][i + 1], vals[j + 1][i + 1], vals[j + 1][i]
+                case = (tl > level) << 3 | (tr > level) << 2 | (br > level) << 1 | (bl > level)
+                if case in (0, 15):
+                    continue
+                top = cross(x, y, tl, x + cw, y, tr, level)
+                right = cross(x + cw, y, tr, x + cw, y + ch, br, level)
+                bottom = cross(x + cw, y + ch, br, x, y + ch, bl, level)
+                left = cross(x, y, tl, x, y + ch, bl, level)
+                pairs = {1: [(left, bottom)], 14: [(left, bottom)], 2: [(bottom, right)],
+                         13: [(bottom, right)], 3: [(left, right)], 12: [(left, right)],
+                         4: [(top, right)], 11: [(top, right)], 6: [(top, bottom)],
+                         9: [(top, bottom)], 7: [(top, left)], 8: [(top, left)],
+                         5: [(top, left), (bottom, right)],
+                         10: [(top, right), (bottom, left)]}[case]
+                for a, b in pairs:
+                    d.line([a, b], fill=fill, width=width)
+    img = Image.alpha_composite(base, layer).convert("RGB")
+    return img.resize((W, H), Image.Resampling.LANCZOS)
+
+
+def base_card(seed):
+    img = topo_background(seed)
     d = ImageDraw.Draw(img)
-    for x in range(0, W, 40):
-        d.line([(x, 0), (x, H)], fill=GRID, width=1)
-    for y in range(0, H, 40):
-        d.line([(0, y), (W, y)], fill=GRID, width=1)
     d.rounded_rectangle([PX, PY, PX + PW, PY + PH], radius=12,
                         fill=PANEL, outline=BORDER, width=2)
     d.rounded_rectangle([PX + 2, PY + 2, PX + PW - 2, PY + 46], radius=10, fill=TITLEBAR)
@@ -226,7 +310,7 @@ def cover(post_dir, lines):
     title, description, tags = front_matter(md)
     slug = os.path.basename(os.path.normpath(post_dir))
 
-    img, d = base_card()
+    img, d = base_card(slug)
     if lines:
         y = terminal(d, lines, slug)
     else:
@@ -264,7 +348,7 @@ def cover(post_dir, lines):
 
 def site_card():
     """The card for pages without a cover: the blog's own title card."""
-    img, d = base_card()
+    img, d = base_card("site")
     segments(d, LEFT, 172, PROMPT + [("  ls ~/blog/posts", DIM)], ImageFont.truetype(MONO, 24))
 
     segments(d, LEFT - 4, 218, [("Londopy", TEXT), ("/blog", ACCENT)],
