@@ -10,8 +10,9 @@ a shared project read as one site.
 
 A post card is written to the bundle as cover.png. Its title and tags come
 from the post's front matter. The terminal above the title shows the post's
-lines from scripts/covers.json ("$ " lines are commands, the rest output),
-or, for a post with no entry there, `cat <slug>.md` and the description.
+lines from scripts/covers.json ("$ " lines are commands, the rest output;
+in output, {word} is highlighted and " # note" is dimmed), or, for a post
+with no entry there, `cat <slug>.md` and the description.
 
 --site writes static/og-image.png, the card for every page without a cover
 (home, about, contact, search, archive, tags). --all writes every post card
@@ -184,12 +185,19 @@ def output_parts(line, cat):
         return gitattributes_parts(line)
     if cat.endswith((".yml", ".yaml")):
         return yaml_parts(line)
+    body, _, comment = line.partition(" #")          # " # note" is dimmed
     parts, pos = [], 0
-    for m in re.finditer(r"\b[0-9a-f]{7,40}\b|\[[^\]]*\]", line):   # hashes, [branch]
-        parts += [(line[pos:m.start()], TEXT),
-                  (m.group(), DIM if m.group().startswith("[") else ACCENT)]
+    # {word} is highlighted (braces dropped), hashes too; [branch] is dimmed
+    for m in re.finditer(r"\{([^}]*)\}|\b[0-9a-f]{7,40}\b|\[[^\]]*\]", body):
+        parts.append((body[pos:m.start()], TEXT))
+        if m.group(1) is not None:
+            parts.append((m.group(1), ACCENT))
+        else:
+            parts.append((m.group(), DIM if m.group().startswith("[") else ACCENT))
         pos = m.end()
-    parts.append((line[pos:], TEXT))
+    parts.append((body[pos:], TEXT))
+    if comment:
+        parts.append((" #" + comment, FAINT))
     return [p for p in parts if p[0]]
 
 
