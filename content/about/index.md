@@ -11,6 +11,8 @@ I'm Londopy. I'm studying engineering with a focus on field work, and heading to
 
 Away from the keyboard, I surf, climb, and freedive. I've been pescatarian for more than eight years, and Daoist philosophy shapes how I think about most things.
 
+{{< figure src="climbing-headlamp.jpg" alt="A climbing shoe on the rock and a trad rack of cams and nuts, lit by a headlamp at night, with a purple rope running up the wall" caption="Climbing by headlamp." >}}
+
 ## What I write about
 
 Mostly security and systems: git internals, tooling, and the industrial control systems I'm heading toward. Some radio. And now and then, whatever I've been reading or eating, like the history of which animals religions have counted as fish.
