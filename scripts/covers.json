@@ -29,5 +29,12 @@
     "  schedule:",
     "    - cron: \"0 14 * * 1\"",
     "  workflow_dispatch:"
+  ],
+  "pescatarian": [
+    "$ cat is-it-fish.txt",
+    "beaver      {fish}   # Quebec, 1600s",
+    "muskrat     {fish}   # Detroit River",
+    "capybara    {fish}   # Venezuela",
+    "alligator   {fish}   # Louisiana, 2010"
   ]
 }
