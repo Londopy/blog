@@ -1,3 +1,8 @@
 {{- /* PaperMod links the ICO/PNG icons itself; these are the extras from scripts/make_icons.py. */ -}}
 <link rel="icon" type="image/svg+xml" href="{{ "favicon.svg" | absURL }}">
 <link rel="manifest" href="{{ "site.webmanifest" | absURL }}">
+{{- /* The JSON API (content/api): the JSON Feed for readers that look for it,
+       and the RFC 8631 links to the API's description and docs. */}}
+<link rel="alternate" type="application/feed+json" title="Londopy (JSON Feed)" href="{{ "api/v1/feed.json" | absURL }}">
+<link rel="service-desc" type="application/vnd.oai.openapi+json;version=3.1" href="{{ "api/openapi.json" | absURL }}">
+<link rel="service-doc" type="text/html" href="{{ "api/" | absURL }}">

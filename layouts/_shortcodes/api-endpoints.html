@@ -1,0 +1,20 @@
+{{- /* The endpoint table on the API docs page, from data/api.yaml: the same
+       catalog as /api/v1/index.json, so the two can't drift apart. */ -}}
+{{- $group := "" -}}
+<table>
+  <thead><tr><th>Endpoint</th><th>What you get</th></tr></thead>
+  <tbody>
+  {{- range site.Data.api.endpoints }}
+    {{- if ne .group $group }}{{ $group = .group }}
+    <tr><th colspan="2">{{ .group }}</th></tr>
+    {{- end }}
+    {{- $path := relURL (strings.TrimPrefix "/" .path) }}
+    <tr>
+      <td><code>{{ if strings.Contains .path "{" }}{{ $path }}{{ else }}<a href="{{ $path }}">{{ $path }}</a>{{ end }}</code></td>
+      <td>{{ .summary }}
+        {{- range $name, $what := .params }}<br><small><code>{{ printf "{%s}" $name }}</code>: {{ $what }}</small>{{ end -}}
+      </td>
+    </tr>
+  {{- end }}
+  </tbody>
+</table>

@@ -26,6 +26,7 @@ New posts go up on Thursdays. Everything publishes here first, and copies on oth
 - Projects: [londopy.github.io](https://londopy.github.io/)
 - Code: [github.com/Londopy](https://github.com/Londopy)
 - Feed: [RSS](https://londopy.github.io/blog/index.xml)
+- API: [every post as JSON]({{< relref "api" >}})
 - Contact: [message form, IRC, Discord]({{< relref "contact" >}})
 
 ## License
