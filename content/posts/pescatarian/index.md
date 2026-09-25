@@ -179,9 +179,17 @@ These are the questions friends actually ask.
 
 **What about everything else?** I track my nutrition in **Cronometer**, which breaks food down into individual vitamins and minerals, so I know instead of guessing. When you cut out meat, the ones worth watching are iron, zinc, B12, and omega-3s. Seafood happens to be great for all four: oysters and clams for iron and zinc, fatty fish for B12 and omega-3s. Fatty fish and seafood are also some of the few good food sources of vitamin D and iodine. (I'm not a doctor or dietitian. If you're changing how you eat in a big way, talk to one.)
 
-**Is it actually healthier?** Maybe. Seventh-day Adventists, many of whom are vegetarian for religious reasons, are some of the most studied eaters on the planet. The Adventist Health Study-2 followed tens of thousands of members, and it's where pescatarians came out ahead of vegans and vegetarians. Compared with meat eaters, pesco-vegetarians had a 19% lower death rate, against 15% for vegans and 9% for lacto-ovo vegetarians. A second analysis had the same winner for colorectal cancer: a 43% lower risk for pesco-vegetarians, and around 16 to 18% lower for vegans and vegetarians. The gaps between those groups fall within the study's margin of error, so read it as fish eaters edging ahead, not a knockout.
+**Is it actually healthier?** Maybe. Seventh-day Adventists, many of whom are vegetarian for religious reasons, are some of the most studied eaters on the planet. The Adventist Health Study-2 followed tens of thousands of members, and it's where pescatarians came out ahead of vegans and vegetarians. Here's how each diet did against meat eaters in two of its analyses, one on [death from any cause](https://doi.org/10.1001/jamainternmed.2013.6473) and one on [colorectal cancer](https://doi.org/10.1001/jamainternmed.2015.59):
 
-Two big British studies, with no religious angle at all, also found fish eaters doing better than meat eaters. EPIC-Oxford followed about 48,000 people for 18 years, and fish eaters had a 13% lower rate of heart disease than meat eaters. UK Biobank followed almost half a million people for 11 years, and fish eaters had a 10% lower risk of cancer overall than regular meat eaters. In those two, vegetarians did better on some measures and worse on others (EPIC-Oxford found a higher stroke rate for them), so no single study settles which diet wins.
+| Diet                 | Death rate | Colorectal cancer |
+|----------------------|------------|-------------------|
+| Pesco-vegetarian     | 19% lower  | 43% lower         |
+| Vegan                | 15% lower  | 16% lower         |
+| Lacto-ovo vegetarian | 9% lower   | 18% lower         |
+
+The death-rate analysis followed 73,308 people for about six years, and the cancer one followed 77,659 people for about seven. The gaps between the three diets fall within the study's margin of error, so read it as fish eaters edging ahead, not a knockout.
+
+Two big British studies, with no religious angle at all, also found fish eaters doing better than meat eaters. [EPIC-Oxford](https://doi.org/10.1136/bmj.l4897) followed about 48,000 people for 18 years, and fish eaters had a 13% lower rate of heart disease than meat eaters. [UK Biobank](https://doi.org/10.1186/s12916-022-02256-w) followed almost half a million people for 11 years, and fish eaters had a 10% lower risk of cancer overall than regular meat eaters. In those two, vegetarians did better on some measures and worse on others (EPIC-Oxford found a higher stroke rate for them), so no single study settles which diet wins.
 
 The catch: these are all observational studies, so they can't prove the diet caused those results. Adventists as a group also don't smoke and rarely drink, and even after researchers adjust for things like that, people who choose a diet like this can differ in ways a study can't fully measure. It's not proof, but it's not nothing.
 
