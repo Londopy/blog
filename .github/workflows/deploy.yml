@@ -38,6 +38,10 @@ jobs:
       - id: pages
         uses: actions/configure-pages@v6
       - run: hugo --gc --minify --baseURL "${{ steps.pages.outputs.base_url }}/"
+      # Validates every API response against the OpenAPI description and checks
+      # the API lists exactly the posts that were built. Fails the deploy if not.
+      - name: Check the JSON API
+        run: python3 scripts/check_api.py public
       - uses: actions/upload-pages-artifact@v5
         with:
           path: ./public
