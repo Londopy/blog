@@ -1,0 +1,85 @@
+# The blog's JSON API, in one place. This catalog drives /api/v1/index.json,
+# the endpoint table on the docs page (/api/) and scripts/check_api.py, so the
+# three can't disagree. Paths are relative to the blog root (baseURL).
+name: Londopy Blog API
+api: londopy-blog
+version: 1.0.0
+description: >-
+  Every post on londopy.github.io/blog as JSON: the full text and metadata,
+  tags, the archive, the numbers, a JSON Feed and shields.io badges. Static
+  files, rebuilt with the blog on every push and every day; read-only, no key,
+  CORS-open. Only published posts appear: a scheduled post shows up on its date.
+repo: https://github.com/Londopy/blog
+raw: https://raw.githubusercontent.com/Londopy/blog/main
+portfolio_api: https://londopy.github.io/api/
+badge_color: d97706
+feed_items: 20
+
+endpoints:
+  - group: Discovery
+    path: /api/v1/index.json
+    summary: Every endpoint, with its URL
+  - group: Discovery
+    path: /api/openapi.json
+    summary: This API, described in OpenAPI 3.1
+  - group: Discovery
+    path: /api/v1/search.json
+    summary: Every post, page and tag, in one small file for search
+
+  - group: Site
+    path: /api/v1/site.json
+    summary: Title, tagline, links, license and publishing schedule
+
+  - group: Posts
+    path: /api/v1/posts.json
+    summary: Every published post, newest first
+  - group: Posts
+    path: /api/v1/posts/{slug}.json
+    summary: One post in full, with its text, headings, code, links and images
+    params:
+      slug: A post's slug, from posts.json
+  - group: Posts
+    path: /api/v1/latest.json
+    summary: The newest post, in full
+
+  - group: Taxonomy
+    path: /api/v1/tags.json
+    summary: Tags, most used first, with the posts carrying each
+  - group: Taxonomy
+    path: /api/v1/tags/{tag}.json
+    summary: One tag, with its posts
+    params:
+      tag: A tag's slug, from tags.json
+  - group: Taxonomy
+    path: /api/v1/archive.json
+    summary: Posts grouped by year and month
+
+  - group: Activity
+    path: /api/v1/stats.json
+    summary: The numbers, all in one place
+
+  - group: Feeds
+    path: /api/v1/feed.json
+    summary: JSON Feed 1.1, with full post content
+    type: application/feed+json
+  - group: Feeds
+    path: /index.xml
+    summary: RSS 2.0, with full post content
+    type: application/rss+xml
+
+  - group: Badges
+    path: /api/v1/badges/{metric}.json
+    summary: A shields.io endpoint badge
+    params:
+      metric: posts, words, latest or updated
+
+  - group: Terminal
+    path: /api/v1/posts.txt
+    summary: The post list, for curl
+    type: text/plain
+
+badges:
+  - posts
+  - words
+  - latest
+  - updated

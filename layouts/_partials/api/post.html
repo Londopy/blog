@@ -1,0 +1,107 @@
+{{- /* One post as an API object. The summary fields always; with .full, also
+       the text, headings, code, links, images, neighbours and source.
+       Takes (dict "page" … "full" true "asc" posts-oldest-first). */ -}}
+{{- $p := .page -}}
+{{- $api := site.Data.api -}}
+{{- $slug := $p.File.ContentBaseName -}}
+{{- $fmt := "2006-01-02T15:04:05-07:00" -}}
+{{- $updated := $p.Date -}}
+{{- if $p.Lastmod.After $p.Date }}{{ $updated = $p.Lastmod }}{{ end -}}
+
+{{- $tags := slice -}}
+{{- range $p.GetTerms "tags" -}}
+  {{- $t := path.Base .RelPermalink -}}
+  {{- $tags = $tags | append (dict
+      "name" .Data.Term
+      "slug" $t
+      "url" .Permalink
+      "api_url" (absURL (printf "api/v1/tags/%s.json" $t))) -}}
+{{- end -}}
+
+{{- $cover := dict -}}
+{{- with $p.Params.cover.image -}}
+  {{- with $p.Resources.GetMatch . -}}
+    {{- $cover = dict "url" .Permalink "width" .Width "height" .Height "alt" ($p.Params.cover.alt | default "") -}}
+  {{- end -}}
+{{- end -}}
+
+{{- $o := dict
+    "slug" $slug
+    "title" $p.Title
+    "description" $p.Description
+    "summary" ($p.Summary | plainify | htmlUnescape | strings.TrimSpace)
+    "url" $p.Permalink
+    "api_url" (absURL (printf "api/v1/posts/%s.json" $slug))
+    "published" ($p.Date.Format $fmt)
+    "updated" ($updated.Format $fmt)
+    "tags" $tags
+    "reading_time_minutes" $p.ReadingTime
+    "word_count" $p.WordCount
+    "cover" (cond (gt (len $cover) 0) $cover nil) -}}
+
+{{- if .full -}}
+  {{- $html := partial "api/absolute-html.html" $p -}}
+
+  {{- $headings := slice -}}
+  {{- range findRESubmatch `<h([2-6]) id="([^"]+)"[^>]*>([\s\S]*?)</h[2-6]>` $html -}}
+    {{- $headings = $headings | append (dict
+        "level" (int (index . 1))
+        "id" (index . 2)
+        "title" (index . 3 | plainify | htmlUnescape | strings.TrimSpace)
+        "url" (printf "%s#%s" $p.Permalink (index . 2))) -}}
+  {{- end -}}
+
+  {{- $langs := slice -}}
+  {{- range findRESubmatch `data-lang="([^"]+)"` $html }}{{ $langs = $langs | append (index . 1) }}{{ end -}}
+
+  {{- $internal := slice -}}
+  {{- $external := slice -}}
+  {{- range findRESubmatch `href="(https?://[^"]+)"` $html -}}
+    {{- $l := index . 1 -}}
+    {{- if hasPrefix $l site.BaseURL }}{{ $internal = $internal | append $l }}{{ else }}{{ $external = $external | append $l }}{{ end -}}
+  {{- end -}}
+
+  {{- $images := slice -}}
+  {{- range $p.Resources.ByType "image" -}}
+    {{- $images = $images | append (dict
+        "name" .Name
+        "url" .Permalink
+        "width" .Width
+        "height" .Height
+        "is_cover" (eq .Name ($p.Params.cover.image | default ""))) -}}
+  {{- end -}}
+
+  {{- /* neighbours in time: the post before this one and the one after */ -}}
+  {{- $asc := .asc -}}
+  {{- $i := -1 -}}
+  {{- range $k, $q := $asc }}{{ if eq $q.RelPermalink $p.RelPermalink }}{{ $i = $k }}{{ end }}{{ end -}}
+  {{- $older := dict -}}
+  {{- $newer := dict -}}
+  {{- if gt $i 0 -}}
+    {{- with index $asc (sub $i 1) -}}
+      {{- $older = dict "slug" .File.ContentBaseName "title" .Title "url" .Permalink "api_url" (absURL (printf "api/v1/posts/%s.json" .File.ContentBaseName)) -}}
+    {{- end -}}
+  {{- end -}}
+  {{- if and (ge $i 0) (lt $i (sub (len $asc) 1)) -}}
+    {{- with index $asc (add $i 1) -}}
+      {{- $newer = dict "slug" .File.ContentBaseName "title" .Title "url" .Permalink "api_url" (absURL (printf "api/v1/posts/%s.json" .File.ContentBaseName)) -}}
+    {{- end -}}
+  {{- end -}}
+
+  {{- $path := replace $p.File.Path "\\" "/" -}}
+  {{- $o = merge $o (dict
+      "content_html" $html
+      "content_text" ($p.Plain | htmlUnescape | strings.TrimSpace)
+      "headings" $headings
+      "code" (dict "blocks" (len (findRE `<pre` $html)) "languages" ($langs | uniq))
+      "links" (dict "internal" ($internal | uniq) "external" ($external | uniq))
+      "images" $images
+      "older" (cond (gt (len $older) 0) $older nil)
+      "newer" (cond (gt (len $newer) 0) $newer nil)
+      "license" (dict "writing" "CC-BY-4.0" "code" "MIT")
+      "source" (dict
+          "markdown" (printf "%s/blob/main/content/%s" $api.repo $path)
+          "raw" (printf "%s/content/%s" $api.raw $path)
+          "history" (printf "%s/commits/main/content/%s" $api.repo $path))) -}}
+{{- end -}}
+{{- return $o -}}

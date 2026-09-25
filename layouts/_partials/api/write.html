@@ -1,0 +1,9 @@
+{{- /* Publish one API file at .path (relative to the blog root). .value is
+       written as indented JSON, or as-is when .text is set. */ -}}
+{{- $body := .value -}}
+{{- if not .text -}}
+  {{- $body = jsonify (dict "indent" "  " "noHTMLEscape" true) .value -}}
+{{- end -}}
+{{- $r := resources.FromString (strings.TrimPrefix "/" .path) $body -}}
+{{- $r.Publish -}}
+{{- return $r.RelPermalink -}}

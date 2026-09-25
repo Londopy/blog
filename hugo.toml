@@ -3,6 +3,9 @@ locale = "en-us"
 title = "Londopy"
 theme = "PaperMod"
 enableRobotsTXT = true
+# Last-modified dates from git, for the API's "updated" fields and the sitemap
+# (the deploy checks out full history for this).
+enableGitInfo = true
 copyright = "© 2026 Londopy · Posts [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/) · Code [MIT](https://github.com/Londopy/blog/blob/main/LICENSE)"
 
 [taxonomies]
@@ -28,6 +31,9 @@ copyright = "© 2026 Londopy · Posts [CC BY 4.0](https://creativecommons.org/li
 [params.label]
   icon = "favicon.svg"
   iconHeight = 28
+
+[params.footer]
+  text = "[API](https://londopy.github.io/blog/api/)"
 
 [params.homeInfoParams]
   Title = "Londopy"
@@ -90,7 +96,16 @@ copyright = "© 2026 Londopy · Posts [CC BY 4.0](https://creativecommons.org/li
   weight = 50
 
 [outputs]
-  home = ["HTML", "RSS", "JSON"]    # JSON powers PaperMod search
+  home = ["HTML", "RSS", "JSON", "api"]    # JSON powers PaperMod search
+
+# The JSON API: layouts/home.api.json renders /api/v1/index.json and publishes
+# every other endpoint. Docs at /api/, catalog in data/api.yaml.
+[outputFormats.api]
+  mediaType = "application/json"
+  baseName = "index"
+  path = "api/v1"
+  isPlainText = true
+  notAlternative = true
 
 # With noClasses = false the colors come from CSS, not from `style`:
 # assets/css/includes/chroma-styles.css is `hugo gen chromastyles --style=monokai`.

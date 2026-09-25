@@ -1,0 +1,9 @@
+{{- /* A page's rendered HTML with every src and href made absolute, so it
+       still works wherever an API client shows it. Anchors (#…), mailto: and
+       full URLs are left alone. */ -}}
+{{- $u := urls.Parse site.BaseURL -}}
+{{- $origin := printf "%s://%s" $u.Scheme $u.Host -}}
+{{- $html := string .Content -}}
+{{- $html = replaceRE `(src|href)="/` (printf `${1}="%s/` $origin) $html -}}
+{{- $html = replaceRE `(src|href)="([^"#/:][^":]*)"` (printf `${1}="%s${2}"` .Permalink) $html -}}
+{{- return $html -}}

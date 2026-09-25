@@ -1,0 +1,250 @@
+{{- /* The blog's JSON API. Docs: /api/ (content/api). Catalog: data/api.yaml.
+       Hugo renders this template once, as /api/v1/index.json, and on the way
+       it publishes every other endpoint with resources.FromString. Everything
+       comes from the published pages, so drafts and scheduled posts never
+       appear: a scheduled post joins the API with the build that publishes it. */ -}}
+{{- $api := site.Data.api -}}
+{{- $gen := now.UTC.Format "2006-01-02T15:04:05Z" -}}
+{{- $desc := (where site.RegularPages "Section" "posts").ByDate.Reverse -}}
+{{- $asc := $desc.ByDate -}}
+{{- $w := "api/write.html" -}}
+{{- $e := "api/envelope.html" -}}
+{{- $u := urls.Parse site.BaseURL -}}
+{{- $origin := printf "%s://%s" $u.Scheme $u.Host -}}
+{{- $author := dict "name" site.Params.author "url" "https://londopy.github.io/" -}}
+
+{{- /* posts: summaries for the lists, full objects for the per-post files */ -}}
+{{- $summaries := slice -}}
+{{- $full := dict -}}
+{{- range $desc -}}
+  {{- $summaries = $summaries | append (partial "api/post.html" (dict "page" .)) -}}
+  {{- $f := partial "api/post.html" (dict "page" . "full" true "asc" $asc) -}}
+  {{- $full = merge $full (dict $f.slug $f) -}}
+  {{- $path := printf "/api/v1/posts/%s.json" $f.slug -}}
+  {{- $_ := partial $w (dict "path" $path "value" (partial $e (dict "path" $path "data" $f "generated" $gen))) -}}
+{{- end -}}
+{{- $_ := partial $w (dict "path" "/api/v1/posts.json" "value" (partial $e (dict "path" "/api/v1/posts.json" "data" $summaries "generated" $gen))) -}}
+
+{{- $latest := dict -}}
+{{- range first 1 $desc }}{{ $latest = index $full .File.ContentBaseName }}{{ end -}}
+{{- $_ := partial $w (dict "path" "/api/v1/latest.json" "value" (partial $e (dict "path" "/api/v1/latest.json" "data" (cond (gt (len $latest) 0) $latest nil) "generated" $gen))) -}}
+
+{{- /* tags, most used first; each also gets its own file with its posts */ -}}
+{{- $tags := slice -}}
+{{- range site.Taxonomies.tags.ByCount -}}
+  {{- $slug := .Name -}}
+  {{- $posts := slice -}}
+  {{- $slugs := slice -}}
+  {{- range .Pages.ByDate.Reverse -}}
+    {{- $posts = $posts | append (partial "api/post.html" (dict "page" .)) -}}
+    {{- $slugs = $slugs | append .File.ContentBaseName -}}
+  {{- end -}}
+  {{- $t := dict
+      "name" .Name
+      "slug" $slug
+      "count" .Count
+      "url" .Page.Permalink
+      "api_url" (absURL (printf "api/v1/tags/%s.json" $slug)) -}}
+  {{- $tags = $tags | append (merge $t (dict "posts" $slugs)) -}}
+  {{- $path := printf "/api/v1/tags/%s.json" $slug -}}
+  {{- $_ := partial $w (dict "path" $path "value" (partial $e (dict "path" $path "data" (merge $t (dict "posts" $posts)) "generated" $gen))) -}}
+{{- end -}}
+{{- $_ := partial $w (dict "path" "/api/v1/tags.json" "value" (partial $e (dict "path" "/api/v1/tags.json" "data" $tags "generated" $gen))) -}}
+
+{{- /* archive: years, then months, newest first */ -}}
+{{- $years := slice -}}
+{{- range $desc.GroupByDate "2006" -}}
+  {{- $months := slice -}}
+  {{- range .Pages.GroupByDate "2006-01" -}}
+    {{- $items := slice -}}
+    {{- range .Pages -}}
+      {{- $items = $items | append (dict
+          "slug" .File.ContentBaseName
+          "title" .Title
+          "published" (.Date.Format "2006-01-02T15:04:05-07:00")
+          "url" .Permalink
+          "api_url" (absURL (printf "api/v1/posts/%s.json" .File.ContentBaseName))) -}}
+    {{- end -}}
+    {{- $months = $months | append (dict "month" .Key "count" (len .Pages) "posts" $items) -}}
+  {{- end -}}
+  {{- $years = $years | append (dict "year" (int .Key) "count" (len .Pages) "months" $months) -}}
+{{- end -}}
+{{- $_ := partial $w (dict "path" "/api/v1/archive.json" "value" (partial $e (dict "path" "/api/v1/archive.json" "data" $years "generated" $gen))) -}}
+
+{{- /* stats */ -}}
+{{- $words := 0 }}{{ $minutes := 0 }}{{ $blocks := 0 }}{{ $images := 0 -}}
+{{- $languages := dict }}{{ $perMonth := dict -}}
+{{- $longest := dict }}{{ $shortest := dict -}}
+{{- range $desc -}}
+  {{- $f := index $full .File.ContentBaseName -}}
+  {{- $words = add $words .WordCount -}}
+  {{- $minutes = add $minutes .ReadingTime -}}
+  {{- $blocks = add $blocks $f.code.blocks -}}
+  {{- $images = add $images (len $f.images) -}}
+  {{- range findRESubmatch `data-lang="([^"]+)"` $f.content_html -}}
+    {{- $l := index . 1 -}}
+    {{- $languages = merge $languages (dict $l (add (index $languages $l | default 0) 1)) -}}
+  {{- end -}}
+  {{- $m := .Date.Format "2006-01" -}}
+  {{- $perMonth = merge $perMonth (dict $m (add (index $perMonth $m | default 0) 1)) -}}
+  {{- $ref := dict "slug" .File.ContentBaseName "title" .Title "words" .WordCount "url" .Permalink -}}
+  {{- if or (not $longest) (gt .WordCount $longest.words) }}{{ $longest = $ref }}{{ end -}}
+  {{- if or (not $shortest) (lt .WordCount $shortest.words) }}{{ $shortest = $ref }}{{ end -}}
+{{- end -}}
+{{- $first := dict }}{{ $last := dict -}}
+{{- range first 1 $asc }}{{ $first = dict "slug" .File.ContentBaseName "title" .Title "published" (.Date.Format "2006-01-02T15:04:05-07:00") "url" .Permalink }}{{ end -}}
+{{- range first 1 $desc }}{{ $last = dict "slug" .File.ContentBaseName "title" .Title "published" (.Date.Format "2006-01-02T15:04:05-07:00") "url" .Permalink }}{{ end -}}
+{{- $n := len $desc -}}
+{{- $stats := dict
+    "posts" $n
+    "words" $words
+    "reading_minutes" $minutes
+    "average_words" (div $words (cond (gt $n 0) $n 1))
+    "tags" (len site.Taxonomies.tags)
+    "code_blocks" $blocks
+    "code_languages" $languages
+    "images" $images
+    "posts_per_month" $perMonth
+    "first_post" (cond (gt (len $first) 0) $first nil)
+    "latest_post" (cond (gt (len $last) 0) $last nil)
+    "longest_post" (cond (gt (len $longest) 0) $longest nil)
+    "shortest_post" (cond (gt (len $shortest) 0) $shortest nil) -}}
+{{- $_ := partial $w (dict "path" "/api/v1/stats.json" "value" (partial $e (dict "path" "/api/v1/stats.json" "data" $stats "generated" $gen))) -}}
+
+{{- /* site */ -}}
+{{- $site := dict
+    "title" site.Title
+    "tagline" site.Params.description
+    "author" $author
+    "language" "en-US"
+    "url" (absURL "")
+    "links" (dict
+        "home" (absURL "")
+        "about" (absURL "about/")
+        "contact" (absURL "contact/")
+        "archive" (absURL "archives/")
+        "tags" (absURL "tags/")
+        "search" (absURL "search/")
+        "rss" (absURL "index.xml")
+        "json_feed" (absURL "api/v1/feed.json")
+        "sitemap" (absURL "sitemap.xml")
+        "api_docs" (absURL "api/")
+        "openapi" (absURL "api/openapi.json")
+        "portfolio" "https://londopy.github.io/"
+        "portfolio_api" $api.portfolio_api
+        "github" "https://github.com/Londopy"
+        "source" $api.repo)
+    "license" (dict
+        "writing" (dict "id" "CC-BY-4.0" "url" "https://creativecommons.org/licenses/by/4.0/")
+        "code" (dict "id" "MIT" "url" (printf "%s/blob/main/LICENSE" $api.repo)))
+    "publishing" (dict
+        "schedule" "New posts go up on Thursdays."
+        "timezone" "America/Los_Angeles"
+        "canonical" "Posts publish here first; copies on other sites link back to the original."
+        "rebuilds" "On every push, and daily at 17:30 UTC, which publishes scheduled posts.")
+    "images" (dict
+        "social_card" (absURL "og-image.png")
+        "favicon" (absURL "favicon.svg")
+        "icon" (absURL "android-chrome-512x512.png"))
+    "counts" (dict "posts" $n "tags" (len site.Taxonomies.tags)) -}}
+{{- $_ := partial $w (dict "path" "/api/v1/site.json" "value" (partial $e (dict "path" "/api/v1/site.json" "data" $site "generated" $gen))) -}}
+
+{{- /* search, shaped like the portfolio API's: {kind, title, subtitle, path, url, keywords} */ -}}
+{{- $search := slice (dict "kind" "page" "title" "Blog" "subtitle" site.Params.description "path" (relURL "") "url" (absURL "") "keywords" (slice "home" "posts" "blog")) -}}
+{{- range slice "/about" "/contact" "/archives" "/tags" "/search" "/api" -}}
+  {{- with site.GetPage . -}}
+    {{- $search = $search | append (dict "kind" "page" "title" .Title "subtitle" (.Description | default "") "path" .RelPermalink "url" .Permalink "keywords" (slice (lower .Title))) -}}
+  {{- end -}}
+{{- end -}}
+{{- range $summaries -}}
+  {{- $kw := slice -}}
+  {{- range .tags }}{{ $kw = $kw | append .name }}{{ end -}}
+  {{- $search = $search | append (dict "kind" "post" "title" .title "subtitle" .description "path" (strings.TrimPrefix $origin .url) "url" .url "keywords" $kw "published" .published) -}}
+{{- end -}}
+{{- range $tags -}}
+  {{- $search = $search | append (dict "kind" "tag" "title" (printf "#%s" .name) "subtitle" (printf "%d %s" .count (cond (eq .count 1) "post" "posts")) "path" (strings.TrimPrefix $origin .url) "url" .url "keywords" (slice "tag" .name)) -}}
+{{- end -}}
+{{- $_ := partial $w (dict "path" "/api/v1/search.json" "value" (partial $e (dict "path" "/api/v1/search.json" "data" $search "generated" $gen))) -}}
+
+{{- /* JSON Feed 1.1: a standard format, so no envelope */ -}}
+{{- $items := slice -}}
+{{- range first $api.feed_items $desc -}}
+  {{- $f := index $full .File.ContentBaseName -}}
+  {{- $names := slice -}}
+  {{- range $f.tags }}{{ $names = $names | append .name }}{{ end -}}
+  {{- $it := dict
+      "id" .Permalink
+      "url" .Permalink
+      "title" .Title
+      "content_html" $f.content_html
+      "summary" .Description
+      "date_published" $f.published
+      "date_modified" $f.updated
+      "tags" $names
+      "authors" (slice $author)
+      "language" "en-US" -}}
+  {{- with $f.cover }}{{ $it = merge $it (dict "image" .url) }}{{ end -}}
+  {{- $items = $items | append $it -}}
+{{- end -}}
+{{- $_ := partial $w (dict "path" "/api/v1/feed.json" "value" (dict
+    "version" "https://jsonfeed.org/version/1.1"
+    "title" site.Title
+    "home_page_url" (absURL "")
+    "feed_url" (absURL "api/v1/feed.json")
+    "description" site.Params.description
+    "icon" (absURL "android-chrome-512x512.png")
+    "favicon" (absURL "favicon-32x32.png")
+    "authors" (slice $author)
+    "language" "en-US"
+    "items" $items)) -}}
+
+{{- /* shields.io endpoint badges: a standard format, so no envelope */ -}}
+{{- $latestTitle := "" }}{{ $latestDate := "" -}}
+{{- range first 1 $desc }}{{ $latestTitle = .Title }}{{ $latestDate = .Date.Format "Jan 2, 2006" }}{{ end -}}
+{{- $latestMsg := $latestTitle | default "none yet" -}}
+{{- if gt (strings.RuneCount $latestMsg) 40 -}}
+  {{- /* cut at a word boundary; truncate would HTML-escape the title */ -}}
+  {{- $latestMsg = printf "%s…" (replaceRE `\s+\S*$` "" (substr $latestMsg 0 40)) -}}
+{{- end -}}
+{{- $badges := dict
+    "posts" (dict "label" "blog posts" "message" (string $n))
+    "words" (dict "label" "words written" "message" (lang.FormatNumber 0 $words))
+    "latest" (dict "label" "latest post" "message" $latestMsg)
+    "updated" (dict "label" "last post" "message" ($latestDate | default "none yet")) -}}
+{{- range $metric := $api.badges -}}
+  {{- $_ := partial $w (dict "path" (printf "/api/v1/badges/%s.json" $metric) "value" (merge (dict "schemaVersion" 1 "color" $api.badge_color) (index $badges $metric))) -}}
+{{- end -}}
+
+{{- /* the post list, for curl */ -}}
+{{- $txt := printf "Londopy blog: %s\n%s\n\n" (absURL "") site.Params.description -}}
+{{- range $desc -}}
+  {{- $txt = printf "%s%s  %s\n            %s\n" $txt (.Date.Format "2006-01-02") .Title .Permalink -}}
+{{- end -}}
+{{- $txt = printf "%s\nJSON: %s\nDocs: %s\n" $txt (absURL "api/v1/posts.json") (absURL "api/") -}}
+{{- $_ := partial $w (dict "path" "/api/v1/posts.txt" "value" $txt "text" true) -}}
+
+{{- /* OpenAPI: authored as YAML in assets/, published as JSON */ -}}
+{{- with resources.Get "api/openapi.yaml" -}}
+  {{- $_ := partial $w (dict "path" "/api/openapi.json" "value" (. | transform.Unmarshal)) -}}
+{{- end -}}
+
+{{- /* and this file: the index of every endpoint */ -}}
+{{- $endpoints := slice -}}
+{{- range $api.endpoints -}}
+  {{- $ep := dict
+      "group" .group
+      "path" (relURL (strings.TrimPrefix "/" .path))
+      "url" (absURL (strings.TrimPrefix "/" .path))
+      "summary" .summary
+      "type" (.type | default "application/json") -}}
+  {{- with .params }}{{ $ep = merge $ep (dict "params" .) }}{{ end -}}
+  {{- $endpoints = $endpoints | append $ep -}}
+{{- end -}}
+{{- partial $e (dict "path" "/api/v1/index.json" "generated" $gen "data" (dict
+    "name" $api.name
+    "description" $api.description
+    "version" $api.version
+    "docs" (absURL "api/")
+    "openapi" (absURL "api/openapi.json")
+    "related" (dict "portfolio_api" $api.portfolio_api)
+    "endpoints" $endpoints)) | jsonify (dict "indent" "  " "noHTMLEscape" true) -}}

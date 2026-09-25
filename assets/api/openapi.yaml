@@ -1,0 +1,646 @@
+# OpenAPI 3.1 description of the blog's JSON API, published as
+# /api/openapi.json by layouts/home.api.json. Keep info.version equal to the
+# version in data/api.yaml; scripts/check_api.py fails the deploy otherwise.
+openapi: 3.1.0
+info:
+  title: Londopy Blog API
+  version: 1.0.0
+  summary: Every post on londopy.github.io/blog as JSON.
+  description: >-
+    Static, read-only files, rebuilt with the blog on every push and daily at
+    17:30 UTC. No key, CORS-open. Only published posts appear; a scheduled
+    post joins the API with the build that publishes it. Every endpoint wraps
+    its payload in an envelope, {meta, data}, except the standard formats: the
+    JSON Feed, the shields.io badges, RSS and posts.txt.
+  contact:
+    name: Londopy
+    url: https://londopy.github.io/blog/contact/
+  license:
+    name: Posts CC BY 4.0, code MIT
+    url: https://github.com/Londopy/blog#license
+externalDocs:
+  description: Docs, with examples
+  url: https://londopy.github.io/blog/api/
+servers:
+  - url: https://londopy.github.io/blog
+    description: GitHub Pages
+tags:
+  - name: Discovery
+  - name: Site
+  - name: Posts
+  - name: Taxonomy
+  - name: Activity
+  - name: Feeds
+  - name: Badges
+  - name: Terminal
+
+paths:
+  /api/v1/index.json:
+    get:
+      tags: [Discovery]
+      operationId: getIndex
+      summary: Every endpoint, with its URL
+      responses:
+        "200":
+          description: The endpoint catalog.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/Envelope"
+                  - properties:
+                      data: { $ref: "#/components/schemas/Index" }
+  /api/openapi.json:
+    get:
+      tags: [Discovery]
+      operationId: getOpenAPI
+      summary: This API, described in OpenAPI 3.1
+      responses:
+        "200":
+          description: This document.
+          content:
+            application/json:
+              schema: { type: object }
+  /api/v1/search.json:
+    get:
+      tags: [Discovery]
+      operationId: getSearch
+      summary: Every post, page and tag, in one small file for search
+      responses:
+        "200":
+          description: Search items, pages first, then posts newest first, then tags.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/Envelope"
+                  - properties:
+                      data:
+                        type: array
+                        items: { $ref: "#/components/schemas/SearchItem" }
+  /api/v1/site.json:
+    get:
+      tags: [Site]
+      operationId: getSite
+      summary: Title, tagline, links, license and publishing schedule
+      responses:
+        "200":
+          description: The blog itself.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/Envelope"
+                  - properties:
+                      data: { $ref: "#/components/schemas/Site" }
+  /api/v1/posts.json:
+    get:
+      tags: [Posts]
+      operationId: listPosts
+      summary: Every published post, newest first
+      responses:
+        "200":
+          description: Post summaries. Follow api_url for a post in full.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/Envelope"
+                  - properties:
+                      data:
+                        type: array
+                        items: { $ref: "#/components/schemas/PostSummary" }
+  /api/v1/posts/{slug}.json:
+    get:
+      tags: [Posts]
+      operationId: getPost
+      summary: One post in full, with its text, headings, code, links and images
+      parameters:
+        - name: slug
+          in: path
+          required: true
+          description: A post's slug, from posts.json.
+          schema: { type: string, examples: [gitattributes] }
+      responses:
+        "200":
+          description: The post.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/Envelope"
+                  - properties:
+                      data: { $ref: "#/components/schemas/Post" }
+        "404":
+          description: No published post has that slug. GitHub Pages answers with its HTML 404 page.
+  /api/v1/latest.json:
+    get:
+      tags: [Posts]
+      operationId: getLatestPost
+      summary: The newest post, in full
+      responses:
+        "200":
+          description: The newest post, or null before the first one.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/Envelope"
+                  - properties:
+                      data:
+                        oneOf:
+                          - $ref: "#/components/schemas/Post"
+                          - type: "null"
+  /api/v1/tags.json:
+    get:
+      tags: [Taxonomy]
+      operationId: listTags
+      summary: Tags, most used first, with the posts carrying each
+      responses:
+        "200":
+          description: Tags, each with the slugs of its posts.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/Envelope"
+                  - properties:
+                      data:
+                        type: array
+                        items: { $ref: "#/components/schemas/Tag" }
+  /api/v1/tags/{tag}.json:
+    get:
+      tags: [Taxonomy]
+      operationId: getTag
+      summary: One tag, with its posts
+      parameters:
+        - name: tag
+          in: path
+          required: true
+          description: A tag's slug, from tags.json.
+          schema: { type: string, examples: [git] }
+      responses:
+        "200":
+          description: The tag, with its posts newest first.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/Envelope"
+                  - properties:
+                      data: { $ref: "#/components/schemas/TagWithPosts" }
+        "404":
+          description: No published post carries that tag.
+  /api/v1/archive.json:
+    get:
+      tags: [Taxonomy]
+      operationId: getArchive
+      summary: Posts grouped by year and month
+      responses:
+        "200":
+          description: Years newest first; months newest first within each.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/Envelope"
+                  - properties:
+                      data:
+                        type: array
+                        items: { $ref: "#/components/schemas/ArchiveYear" }
+  /api/v1/stats.json:
+    get:
+      tags: [Activity]
+      operationId: getStats
+      summary: The numbers, all in one place
+      responses:
+        "200":
+          description: Counts and records across every published post.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/Envelope"
+                  - properties:
+                      data: { $ref: "#/components/schemas/Stats" }
+  /api/v1/feed.json:
+    get:
+      tags: [Feeds]
+      operationId: getJSONFeed
+      summary: JSON Feed 1.1, with full post content
+      externalDocs:
+        url: https://www.jsonfeed.org/version/1.1/
+      responses:
+        "200":
+          description: The newest posts as a JSON Feed. No envelope.
+          content:
+            application/feed+json:
+              schema: { $ref: "#/components/schemas/JSONFeed" }
+  /index.xml:
+    get:
+      tags: [Feeds]
+      operationId: getRSS
+      summary: RSS 2.0, with full post content
+      responses:
+        "200":
+          description: The same posts as RSS 2.0.
+          content:
+            application/rss+xml:
+              schema: { type: string }
+  /api/v1/badges/{metric}.json:
+    get:
+      tags: [Badges]
+      operationId: getBadge
+      summary: A shields.io endpoint badge
+      description: >-
+        Use with https://img.shields.io/endpoint?url=<this URL>. No envelope.
+      externalDocs:
+        url: https://shields.io/badges/endpoint-badge
+      parameters:
+        - name: metric
+          in: path
+          required: true
+          schema:
+            type: string
+            enum: [posts, words, latest, updated]
+      responses:
+        "200":
+          description: The badge.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Badge" }
+  /api/v1/posts.txt:
+    get:
+      tags: [Terminal]
+      operationId: getPostsText
+      summary: The post list, for curl
+      responses:
+        "200":
+          description: One post per entry, date, title and URL, newest first.
+          content:
+            text/plain:
+              schema: { type: string }
+
+components:
+  schemas:
+    Meta:
+      type: object
+      required: [api, version, generated, self, docs]
+      properties:
+        api: { type: string, const: londopy-blog }
+        version: { type: string, description: The API version (semver). }
+        generated: { type: string, format: date-time, description: When this file was built (UTC). }
+        self: { type: string, format: uri, description: This file's URL. }
+        docs: { type: string, format: uri }
+    Envelope:
+      type: object
+      required: [meta, data]
+      properties:
+        meta: { $ref: "#/components/schemas/Meta" }
+        data: {}
+    Endpoint:
+      type: object
+      required: [group, path, url, summary, type]
+      properties:
+        group: { type: string }
+        path: { type: string, description: "URL path on the host, e.g. /blog/api/v1/posts.json" }
+        url: { type: string, description: "Absolute URL; templated paths keep their {placeholder}." }
+        summary: { type: string }
+        type: { type: string, description: Media type of the response. }
+        params:
+          type: object
+          additionalProperties: { type: string }
+    Index:
+      type: object
+      required: [name, description, version, docs, openapi, endpoints]
+      properties:
+        name: { type: string }
+        description: { type: string }
+        version: { type: string }
+        docs: { type: string, format: uri }
+        openapi: { type: string, format: uri }
+        related:
+          type: object
+          properties:
+            portfolio_api: { type: string, format: uri }
+        endpoints:
+          type: array
+          items: { $ref: "#/components/schemas/Endpoint" }
+    TagRef:
+      type: object
+      required: [name, slug, url, api_url]
+      properties:
+        name: { type: string, description: The tag as written in the post. }
+        slug: { type: string }
+        url: { type: string, format: uri }
+        api_url: { type: string, format: uri }
+    Cover:
+      type: object
+      required: [url, width, height, alt]
+      properties:
+        url: { type: string, format: uri }
+        width: { type: integer }
+        height: { type: integer }
+        alt: { type: string }
+    PostRef:
+      type: object
+      required: [slug, title, url, api_url]
+      properties:
+        slug: { type: string }
+        title: { type: string }
+        url: { type: string, format: uri }
+        api_url: { type: string, format: uri }
+    PostSummary:
+      type: object
+      required: [slug, title, description, summary, url, api_url, published, updated, tags, reading_time_minutes, word_count, cover]
+      properties:
+        slug: { type: string }
+        title: { type: string }
+        description: { type: string, description: The author's one-paragraph description. }
+        summary: { type: string, description: "The opening of the post, as plain text." }
+        url: { type: string, format: uri, description: The post on the blog (the canonical URL). }
+        api_url: { type: string, format: uri }
+        published: { type: string, format: date-time }
+        updated: { type: string, format: date-time, description: "Last change (from git), never before published." }
+        tags:
+          type: array
+          items: { $ref: "#/components/schemas/TagRef" }
+        reading_time_minutes: { type: integer }
+        word_count: { type: integer }
+        cover:
+          oneOf:
+            - $ref: "#/components/schemas/Cover"
+            - type: "null"
+    Heading:
+      type: object
+      required: [level, id, title, url]
+      properties:
+        level: { type: integer, minimum: 2, maximum: 6 }
+        id: { type: string }
+        title: { type: string }
+        url: { type: string, format: uri }
+    Image:
+      type: object
+      required: [name, url, width, height, is_cover]
+      properties:
+        name: { type: string }
+        url: { type: string, format: uri }
+        width: { type: integer }
+        height: { type: integer }
+        is_cover: { type: boolean }
+    Post:
+      allOf:
+        - $ref: "#/components/schemas/PostSummary"
+        - type: object
+          required: [content_html, content_text, headings, code, links, images, older, newer, license, source]
+          properties:
+            content_html:
+              type: string
+              description: The rendered post, with every src and href made absolute.
+            content_text: { type: string }
+            headings:
+              type: array
+              items: { $ref: "#/components/schemas/Heading" }
+            code:
+              type: object
+              required: [blocks, languages]
+              properties:
+                blocks: { type: integer }
+                languages:
+                  type: array
+                  items: { type: string }
+            links:
+              type: object
+              required: [internal, external]
+              properties:
+                internal:
+                  type: array
+                  items: { type: string, format: uri }
+                external:
+                  type: array
+                  items: { type: string, format: uri }
+            images:
+              type: array
+              items: { $ref: "#/components/schemas/Image" }
+            older:
+              description: The post published before this one.
+              oneOf:
+                - $ref: "#/components/schemas/PostRef"
+                - type: "null"
+            newer:
+              description: The post published after this one.
+              oneOf:
+                - $ref: "#/components/schemas/PostRef"
+                - type: "null"
+            license:
+              type: object
+              properties:
+                writing: { type: string, const: CC-BY-4.0 }
+                code: { type: string, const: MIT }
+            source:
+              type: object
+              properties:
+                markdown: { type: string, format: uri }
+                raw: { type: string, format: uri }
+                history: { type: string, format: uri }
+    Tag:
+      type: object
+      required: [name, slug, count, url, api_url, posts]
+      properties:
+        name: { type: string }
+        slug: { type: string }
+        count: { type: integer }
+        url: { type: string, format: uri }
+        api_url: { type: string, format: uri }
+        posts:
+          type: array
+          description: Slugs of the posts carrying this tag, newest first.
+          items: { type: string }
+    TagWithPosts:
+      type: object
+      required: [name, slug, count, url, api_url, posts]
+      properties:
+        name: { type: string }
+        slug: { type: string }
+        count: { type: integer }
+        url: { type: string, format: uri }
+        api_url: { type: string, format: uri }
+        posts:
+          type: array
+          items: { $ref: "#/components/schemas/PostSummary" }
+    ArchivePost:
+      type: object
+      required: [slug, title, published, url, api_url]
+      properties:
+        slug: { type: string }
+        title: { type: string }
+        published: { type: string, format: date-time }
+        url: { type: string, format: uri }
+        api_url: { type: string, format: uri }
+    ArchiveYear:
+      type: object
+      required: [year, count, months]
+      properties:
+        year: { type: integer }
+        count: { type: integer }
+        months:
+          type: array
+          items:
+            type: object
+            required: [month, count, posts]
+            properties:
+              month: { type: string, pattern: "^[0-9]{4}-[0-9]{2}$" }
+              count: { type: integer }
+              posts:
+                type: array
+                items: { $ref: "#/components/schemas/ArchivePost" }
+    PostDate:
+      type: object
+      required: [slug, title, published, url]
+      properties:
+        slug: { type: string }
+        title: { type: string }
+        published: { type: string, format: date-time }
+        url: { type: string, format: uri }
+    PostWords:
+      type: object
+      required: [slug, title, words, url]
+      properties:
+        slug: { type: string }
+        title: { type: string }
+        words: { type: integer }
+        url: { type: string, format: uri }
+    Stats:
+      type: object
+      required: [posts, words, reading_minutes, average_words, tags, code_blocks, code_languages, images, posts_per_month, first_post, latest_post, longest_post, shortest_post]
+      properties:
+        posts: { type: integer }
+        words: { type: integer }
+        reading_minutes: { type: integer }
+        average_words: { type: integer }
+        tags: { type: integer }
+        code_blocks: { type: integer }
+        code_languages:
+          type: object
+          description: Code blocks per language.
+          additionalProperties: { type: integer }
+        images: { type: integer }
+        posts_per_month:
+          type: object
+          description: Posts per month, keyed YYYY-MM.
+          additionalProperties: { type: integer }
+        first_post:
+          oneOf: [{ $ref: "#/components/schemas/PostDate" }, { type: "null" }]
+        latest_post:
+          oneOf: [{ $ref: "#/components/schemas/PostDate" }, { type: "null" }]
+        longest_post:
+          oneOf: [{ $ref: "#/components/schemas/PostWords" }, { type: "null" }]
+        shortest_post:
+          oneOf: [{ $ref: "#/components/schemas/PostWords" }, { type: "null" }]
+    Site:
+      type: object
+      required: [title, tagline, author, language, url, links, license, publishing, images, counts]
+      properties:
+        title: { type: string }
+        tagline: { type: string }
+        author:
+          type: object
+          properties:
+            name: { type: string }
+            url: { type: string, format: uri }
+        language: { type: string }
+        url: { type: string, format: uri }
+        links:
+          type: object
+          additionalProperties: { type: string, format: uri }
+        license:
+          type: object
+          properties:
+            writing:
+              type: object
+              properties:
+                id: { type: string }
+                url: { type: string, format: uri }
+            code:
+              type: object
+              properties:
+                id: { type: string }
+                url: { type: string, format: uri }
+        publishing:
+          type: object
+          properties:
+            schedule: { type: string }
+            timezone: { type: string }
+            canonical: { type: string }
+            rebuilds: { type: string }
+        images:
+          type: object
+          additionalProperties: { type: string, format: uri }
+        counts:
+          type: object
+          properties:
+            posts: { type: integer }
+            tags: { type: integer }
+    SearchItem:
+      type: object
+      required: [kind, title, subtitle, path, url, keywords]
+      properties:
+        kind: { type: string, enum: [page, post, tag] }
+        title: { type: string }
+        subtitle: { type: string }
+        path: { type: string, description: URL path on the host. }
+        url: { type: string, format: uri }
+        keywords:
+          type: array
+          items: { type: string }
+        published: { type: string, format: date-time, description: Posts only. }
+    Badge:
+      type: object
+      required: [schemaVersion, label, message, color]
+      properties:
+        schemaVersion: { type: integer, const: 1 }
+        label: { type: string }
+        message: { type: string }
+        color: { type: string }
+    JSONFeedAuthor:
+      type: object
+      properties:
+        name: { type: string }
+        url: { type: string, format: uri }
+    JSONFeedItem:
+      type: object
+      required: [id, url, title, content_html, date_published]
+      properties:
+        id: { type: string }
+        url: { type: string, format: uri }
+        title: { type: string }
+        content_html: { type: string }
+        summary: { type: string }
+        image: { type: string, format: uri }
+        date_published: { type: string, format: date-time }
+        date_modified: { type: string, format: date-time }
+        tags:
+          type: array
+          items: { type: string }
+        authors:
+          type: array
+          items: { $ref: "#/components/schemas/JSONFeedAuthor" }
+        language: { type: string }
+    JSONFeed:
+      type: object
+      required: [version, title, items]
+      properties:
+        version: { type: string, const: "https://jsonfeed.org/version/1.1" }
+        title: { type: string }
+        home_page_url: { type: string, format: uri }
+        feed_url: { type: string, format: uri }
+        description: { type: string }
+        icon: { type: string, format: uri }
+        favicon: { type: string, format: uri }
+        authors:
+          type: array
+          items: { $ref: "#/components/schemas/JSONFeedAuthor" }
+        language: { type: string }
+        items:
+          type: array
+          items: { $ref: "#/components/schemas/JSONFeedItem" }
