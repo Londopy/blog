@@ -135,6 +135,8 @@ Which brings me back to that philosopher.
 
 ## What an ancient book about fish taught me
 
+{{< figure src="zhuangzi-watson.jpg" align="center" width="360" alt="A cream hardcover of The Complete Works of Zhuangzi, translated by Burton Watson, with a plum-blossom branch on the cover" caption="My copy: Burton Watson's translation." >}}
+
 His name was Zhuangzi, and the book of stories and arguments that carries his name, the *Zhuangzi*, is one of the two great classics of Daoist philosophy. It's the philosophy that shapes how I think about all of this. Daoist philosophy doesn't tell you what to eat. It's about moving with the natural grain of things instead of forcing them.
 
 And conveniently for this post, it's full of fish.
