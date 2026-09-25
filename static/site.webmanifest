@@ -1,7 +1,7 @@
 {
   "name": "Londopy",
   "short_name": "Londopy",
-  "description": "Notes on security, systems, radio, and building things.",
+  "description": "Notes on security, systems, radio, and building things, plus whatever else I'm chewing on.",
   "start_url": "/blog/",
   "scope": "/blog/",
   "display": "minimal-ui",

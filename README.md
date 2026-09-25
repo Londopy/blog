@@ -1,7 +1,7 @@
 # Londopy blog
 
-Notes on security, systems, radio, and building things.
-Live at **https://londopy.github.io/blog/**.
+Notes on security, systems, radio, and building things, plus whatever else
+I'm chewing on. Live at **https://londopy.github.io/blog/**.
 
 Built with [Hugo](https://gohugo.io/) (extended) and the
 [PaperMod](https://github.com/adityatelange/hugo-PaperMod) theme, deployed to

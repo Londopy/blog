@@ -359,9 +359,10 @@ def site_card():
         ("Notes on ", DIM), ("security", ACCENT), (", ", DIM),
         ("systems", ACCENT), (", ", DIM), ("radio", ACCENT), (",", DIM),
     ], fs)
-    segments(d, LEFT, 352, [("and ", DIM), ("building things", ACCENT), (".", DIM)], fs)
+    segments(d, LEFT, 352, [("and ", DIM), ("building things", ACCENT), (",", DIM)], fs)
+    segments(d, LEFT, 392, [("plus ", DIM), ("whatever else I'm chewing on", ACCENT), (".", DIM)], fs)
 
-    segments(d, LEFT + 2, 440, [
+    segments(d, LEFT + 2, 456, [
         ("posts publish here first · full-text RSS ", FAINT), ("▌", ACCENT),
     ], ImageFont.truetype(MONO, 19))
 
