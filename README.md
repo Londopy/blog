@@ -93,6 +93,31 @@ The build prints two deprecation warnings (`.Language.LanguageCode` and
 `.Language.LanguageDirection`). They come from the theme's templates and will
 go away when PaperMod catches up with Hugo.
 
+## API
+
+Every post is also served as JSON under `/blog/api/v1/`, documented at
+https://londopy.github.io/blog/api/ and described in OpenAPI 3.1 at
+`/blog/api/openapi.json`. It's static: Hugo writes it on every build, from the
+same published pages as the site, so drafts and scheduled posts never show up
+early. The pieces:
+
+- `data/api.yaml`: the catalog of endpoints. It feeds `/api/v1/index.json`,
+  the table on the docs page and the deploy check.
+- `layouts/home.api.json` and `layouts/_partials/api/`: the templates that
+  write every endpoint.
+- `assets/api/openapi.yaml`: the OpenAPI description, published as JSON.
+- `content/api/index.md`: the docs page.
+- `scripts/check_api.py`: run by the deploy after every build. It validates
+  each response against the OpenAPI schemas and checks the API lists exactly
+  the posts that were built. Run it locally with
+  `hugo -d public && python scripts/check_api.py public`.
+
+To add an endpoint: add it to `data/api.yaml`, write it in
+`layouts/home.api.json`, and describe it in `assets/api/openapi.yaml`. The
+check fails the deploy if the catalog and the OpenAPI paths disagree. Within
+`v1`, only add fields and endpoints; anything that would break a client goes
+in a new `/api/v2/`.
+
 ## Cross-posting
 
 The blog is the canonical home of every post. Copies on dev.to, Hashnode, or
