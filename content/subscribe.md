@@ -5,8 +5,6 @@ hidemeta: true
 hiddenInRss: true
 ShowToc: false
 ShowPostNavLinks: false
-# A draft until the email sign-up is set up (params.newsletter.buttondown in hugo.toml).
-draft: true
 ---
 
 New posts go up on Thursdays, and you don't have to remember to check back.

@@ -40,11 +40,11 @@ copyright = "© 2026 Londopy · Posts [CC BY 4.0](https://creativecommons.org/li
 # (/subscribe/ and the box after each post) posts to. While it's empty, the
 # form and the box stay hidden.
 [params.newsletter]
-  buttondown = ""
+  buttondown = "londopy"
 
 [params.homeInfoParams]
   Title = "Londopy"
-  Content = "Notes on security, systems, radio, and building things, plus whatever else I'm chewing on."
+  Content = "Notes on security, systems, radio, and building things, plus whatever else I'm chewing on.\n\nNew posts every Thursday. [Get them by email or RSS](subscribe/)."
 
 [[params.socialIcons]]
   name = "github"

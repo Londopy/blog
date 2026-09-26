@@ -116,8 +116,8 @@ subscribers), so publishing a post is all it takes:
 
 The `BUTTONDOWN_API_KEY` repository secret holds the API key, and
 `params.newsletter.buttondown` in `hugo.toml` names the Buttondown account
-that the sign-up forms post to. While that's empty, the box after each post
-stays hidden, and so does `content/subscribe.md` (a draft).
+that the sign-up forms post to (`londopy`). While it's empty, the form on
+`/subscribe/` and the box after each post stay hidden.
 
 If an email didn't go out, run the workflow by hand (Actions, then "Deploy
 Hugo site to Pages", then "Run workflow") with the post's slug. Tick "only

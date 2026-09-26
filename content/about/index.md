@@ -19,7 +19,7 @@ Mostly security and systems: git internals, tooling, and the industrial control 
 
 ## How this blog works
 
-New posts go up on Thursdays. Everything publishes here first, and copies on other sites link back to the original. If you spot a mistake, tell me through the [contact page]({{< relref "contact" >}}) and I'll fix it.
+New posts go up on Thursdays, and you can [get each one by email or RSS]({{< relref "subscribe" >}}). Everything publishes here first, and copies on other sites link back to the original. If you spot a mistake, tell me through the [contact page]({{< relref "contact" >}}) and I'll fix it.
 
 ## Elsewhere
 
