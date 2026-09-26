@@ -1,0 +1,81 @@
+/* The email sign-up: the box after each post (layouts/_partials/extend_post_content.html)
+   and the form it shares with /subscribe/ (layouts/_partials/subscribe-form.html).
+   Colors are PaperMod's theme variables, so it follows light and dark. */
+.subscribe-box {
+    margin-top: 40px;
+    padding: 20px 24px;
+    background: var(--entry);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+}
+
+.subscribe-box p {
+    margin: 0;
+    color: var(--secondary);
+    font-size: 16px;
+    line-height: 1.6;
+}
+
+.subscribe-box .subscribe-box-title {
+    margin-bottom: 4px;
+    color: var(--primary);
+    font-size: 20px;
+    font-weight: 600;
+}
+
+.subscribe-box .subscribe-box-more {
+    font-size: 14px;
+}
+
+.subscribe-box a {
+    color: var(--primary);
+    text-decoration: underline;
+    text-underline-offset: 0.3rem;
+}
+
+.subscribe-form {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 16px 0;
+}
+
+/* The label is for screen readers; the placeholder shows sighted readers what goes there. */
+.subscribe-form label {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+}
+
+.subscribe-form input[type="email"] {
+    flex: 1 1 160px; /* narrow enough to share a row with the button on a phone */
+    min-width: 0;
+    padding: 8px 12px;
+    font-size: 16px; /* under 16px, iOS zooms in when the field gets focus */
+    color: var(--primary);
+    background: var(--theme);
+    border: 1px solid var(--tertiary);
+    border-radius: var(--radius);
+}
+
+.subscribe-form button {
+    padding: 8px 20px;
+    font-size: 16px;
+    font-weight: 500;
+    color: var(--theme);
+    background: var(--primary);
+    border-radius: var(--radius);
+}
+
+.subscribe-form button:hover {
+    opacity: 0.85;
+}
+
+.subscribe-form input[type="email"]:focus-visible,
+.subscribe-form button:focus-visible {
+    outline: 2px solid var(--primary);
+    outline-offset: 2px;
+}

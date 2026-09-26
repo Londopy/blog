@@ -35,6 +35,13 @@ copyright = "© 2026 Londopy · Posts [CC BY 4.0](https://creativecommons.org/li
 [params.footer]
   text = "[API](https://londopy.github.io/blog/api/)"
 
+# Emails for new posts. The deploy sends them through Buttondown
+# (scripts/notify.py). This is the Buttondown username that the sign-up form
+# (/subscribe/ and the box after each post) posts to. While it's empty, the
+# form and the box stay hidden.
+[params.newsletter]
+  buttondown = ""
+
 [params.homeInfoParams]
   Title = "Londopy"
   Content = "Notes on security, systems, radio, and building things, plus whatever else I'm chewing on."

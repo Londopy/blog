@@ -10,6 +10,15 @@ on:
   schedule:
     - cron: "30 17 * * *"
   workflow_dispatch:
+    inputs:
+      email_post:
+        description: "Also email subscribers about this post (its slug), if its email didn't go out. Leave empty to just deploy."
+        type: string
+        default: ""
+      email_draft:
+        description: "With a slug above: only make a draft in Buttondown to preview, and send nothing."
+        type: boolean
+        default: false
 
 permissions:
   contents: read
@@ -23,6 +32,8 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-latest
+    outputs:
+      new_posts: ${{ steps.new_posts.outputs.new_posts }}
     steps:
       - uses: actions/checkout@v7
         with:
@@ -42,6 +53,21 @@ jobs:
       # the API lists exactly the posts that were built. Fails the deploy if not.
       - name: Check the JSON API
         run: python3 scripts/check_api.py public
+      # Which posts this deploy publishes: the ones in this build that the live
+      # site doesn't list yet. The notify job emails them after the deploy.
+      # Neither step can stop the deploy; if either fails, nobody gets emailed.
+      - name: Test the notifier
+        id: notifier
+        continue-on-error: true
+        run: python3 scripts/test_notify.py
+      - name: Find posts to email
+        id: new_posts
+        if: steps.notifier.outcome == 'success'
+        continue-on-error: true
+        env:
+          LIVE_POSTS: ${{ steps.pages.outputs.base_url }}/api/v1/posts.json
+          EMAIL_POST: ${{ inputs.email_post }}
+        run: python3 scripts/notify.py plan public
       - uses: actions/upload-pages-artifact@v5
         with:
           path: ./public
@@ -55,3 +81,23 @@ jobs:
     steps:
       - id: deployment
         uses: actions/deploy-pages@v5
+
+  # Emails subscribers about the posts this deploy published, through
+  # Buttondown (scripts/notify.py). Until the BUTTONDOWN_API_KEY secret
+  # exists, it only notes which posts it would have emailed.
+  notify:
+    needs: [build, deploy]
+    if: needs.build.outputs.new_posts != '' && needs.build.outputs.new_posts != '[]'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          sparse-checkout: scripts
+      - name: Email subscribers
+        env:
+          NEW_POSTS: ${{ needs.build.outputs.new_posts }}
+          BUTTONDOWN_API_KEY: ${{ secrets.BUTTONDOWN_API_KEY }}
+          EMAIL_DRAFT: ${{ inputs.email_draft }}
+        run: python3 scripts/notify.py send

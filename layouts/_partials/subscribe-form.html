@@ -1,0 +1,13 @@
+{{- /* The email sign-up form, used by content/subscribe.md and the box after
+       each post. Renders nothing until params.newsletter.buttondown in
+       hugo.toml names the Buttondown account. It's a plain form post, as
+       Buttondown asks: its reply page can ask the reader to pass a CAPTCHA,
+       so it opens in a new tab. */ -}}
+{{- with site.Params.newsletter.buttondown }}
+<form class="subscribe-form" action="https://buttondown.com/api/emails/embed-subscribe/{{ . }}" method="post" target="_blank">
+  <label for="subscribe-email">Email address</label>
+  <input id="subscribe-email" type="email" name="email" placeholder="you@example.com" autocomplete="email" required>
+  <input type="hidden" name="embed" value="1">
+  <button type="submit">Subscribe</button>
+</form>
+{{- end }}

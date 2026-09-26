@@ -40,7 +40,8 @@ deploy workflow. If you cloned without `--recurse-submodules`, run
 6. To publish, set `draft: false`, then commit and push. The `date` decides
    when the post appears: a date that has passed goes live with the push, and
    a future date goes live with the first daily rebuild on or after it (see
-   Deploying). That's how to schedule a post.
+   Deploying). That's how to schedule a post. Either way, subscribers get an
+   email once it's live (see Emails for new posts).
 
 Images live next to the post in its page bundle. Keep `cover.relative: true`
 in the front matter: PaperMod builds `og:image` from it, and without it the
@@ -92,6 +93,45 @@ git submodule update --remote themes/PaperMod
 The build prints two deprecation warnings (`.Language.LanguageCode` and
 `.Language.LanguageDirection`). They come from the theme's templates and will
 go away when PaperMod catches up with Hugo.
+
+## Emails for new posts
+
+Readers can get each new post by email. The deploy sends the emails itself,
+through [Buttondown](https://buttondown.com)'s API (free for up to 100
+subscribers), so publishing a post is all it takes:
+
+- The build job's "Find posts to email" step (`scripts/notify.py plan`)
+  compares the posts in the new build with the ones the live site lists at
+  `/api/v1/posts.json`. The posts only the new build has are the ones this
+  deploy publishes, whether they were pushed or were scheduled and let
+  through by the daily rebuild.
+- After the deploy, the `notify` job (`scripts/notify.py send`) emails each
+  of them. The subject is the title, and the body is the cover, the
+  description, and a link. It first asks Buttondown whether that post was
+  already emailed, because Pages can serve the old posts.json for ten minutes
+  after a deploy.
+- Nothing about emails can stop a deploy. If the notifier's tests fail, the
+  live site can't be read, or more than three posts turn up at once, nobody
+  is emailed and the run shows a warning.
+
+The `BUTTONDOWN_API_KEY` repository secret holds the API key, and
+`params.newsletter.buttondown` in `hugo.toml` names the Buttondown account
+that the sign-up forms post to. While that's empty, the box after each post
+stays hidden, and so does `content/subscribe.md` (a draft).
+
+If an email didn't go out, run the workflow by hand (Actions, then "Deploy
+Hugo site to Pages", then "Run workflow") with the post's slug. Tick "only
+make a draft" to preview the email in Buttondown instead. From a terminal:
+
+```sh
+gh workflow run deploy.yml -f email_post=<slug> -f email_draft=true
+```
+
+Changing a post's slug makes it look new, so it gets emailed again.
+
+`python scripts/test_notify.py` runs the notifier's tests offline, against a
+stand-in for Buttondown. The deploy runs them too, before it looks for posts
+to email.
 
 ## API
 

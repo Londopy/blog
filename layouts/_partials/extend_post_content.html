@@ -1,0 +1,11 @@
+{{- /* PaperMod puts this between a page's content and its footer. On posts it's
+       a way to get the next one without checking back, once the email sign-up
+       is set up (params.newsletter.buttondown). */ -}}
+{{- if and (eq .Section "posts") site.Params.newsletter.buttondown }}
+<aside class="subscribe-box" id="subscribe" aria-label="Subscribe">
+  <p class="subscribe-box-title">Get the next post by email</p>
+  <p>New posts go up on Thursdays. Leave your email and each one comes to you.</p>
+  {{- partial "subscribe-form.html" . }}
+  <p class="subscribe-box-more">Prefer a feed reader? Here's the <a href="{{ "index.xml" | absURL }}">RSS feed</a>, and <a href="{{ "subscribe/" | absURL }}">more ways to follow</a>.</p>
+</aside>
+{{- end }}
