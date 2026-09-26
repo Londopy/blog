@@ -4,7 +4,7 @@
 <table>
   <thead><tr><th>Endpoint</th><th>What you get</th></tr></thead>
   <tbody>
-  {{- range site.Data.api.endpoints }}
+  {{- range hugo.Data.api.endpoints }}
     {{- if ne .group $group }}{{ $group = .group }}
     <tr><th colspan="2">{{ .group }}</th></tr>
     {{- end }}

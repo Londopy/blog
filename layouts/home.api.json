@@ -3,7 +3,7 @@
        it publishes every other endpoint with resources.FromString. Everything
        comes from the published pages, so drafts and scheduled posts never
        appear: a scheduled post joins the API with the build that publishes it. */ -}}
-{{- $api := site.Data.api -}}
+{{- $api := hugo.Data.api -}}
 {{- $gen := now.UTC.Format "2006-01-02T15:04:05Z" -}}
 {{- $desc := (where site.RegularPages "Section" "posts").ByDate.Reverse -}}
 {{- $asc := $desc.ByDate -}}

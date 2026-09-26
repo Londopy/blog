@@ -1,6 +1,6 @@
 {{- /* Wrap an endpoint's data the way the portfolio API does: {meta, data}.
        Takes (dict "path" "/api/v1/posts.json" "data" … "generated" …). */ -}}
-{{- $api := site.Data.api -}}
+{{- $api := hugo.Data.api -}}
 {{- $meta := dict
     "api" $api.api
     "version" $api.version

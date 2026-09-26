@@ -2,7 +2,7 @@
        the text, headings, code, links, images, neighbours and source.
        Takes (dict "page" … "full" true "asc" posts-oldest-first). */ -}}
 {{- $p := .page -}}
-{{- $api := site.Data.api -}}
+{{- $api := hugo.Data.api -}}
 {{- $slug := $p.File.ContentBaseName -}}
 {{- $fmt := "2006-01-02T15:04:05-07:00" -}}
 {{- $updated := $p.Date -}}
