@@ -36,5 +36,11 @@
     "muskrat     {fish}   # Detroit River",
     "capybara    {fish}   # Venezuela",
     "alligator   {fish}   # Louisiana, 2010"
+  ],
+  "diresq": [
+    "$ flask --app app sweep",
+    "ana      on scene   2 min ago",
+    "luis     en route   9 min ago",
+    "jordan   {overdue}  47 min ago  # report filed"
   ]
 }
