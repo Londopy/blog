@@ -268,6 +268,9 @@ def send():
 
 
 def main(argv):
+    # A title can hold characters a Windows console can't print; that mustn't stop a send.
+    if hasattr(sys.stdout, "reconfigure"):
+        sys.stdout.reconfigure(errors="backslashreplace")
     if argv[:1] == ["plan"]:
         return plan(argv[1] if len(argv) > 1 else "public")
     if argv[:1] == ["send"]:
