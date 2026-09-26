@@ -29,6 +29,10 @@ It's called **DiresQ**. We built the first version in a single 14-hour night for
 
 But placing isn't the interesting part. The interesting part is the three times our own code lied to us, and looked completely fine doing it.
 
+![A responder goes quiet, the accountability board turns red, and a report files itself](demo.gif)
+
+*Five responders on scene. One goes quiet. At fifteen minutes the board turns red, and the report on the right files itself.*
+
 ## Every disaster app tracks the disaster
 
 Crowdsourced flood maps show where the water is. Social media shows who's asking for help. Agencies have dispatch systems, but only for their own people: on a roster, carrying a radio, answering to an incident commander.
