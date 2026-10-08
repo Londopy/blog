@@ -1,0 +1,90 @@
+{{- /* Comments under each post, from giscus (giscus.app). Each post's thread is
+       a GitHub Discussion in the repo that params.giscus (hugo.toml) names.
+       Reading needs nothing; commenting needs a GitHub sign-in. PaperMod calls
+       this partial while params.comments is on, and a post can opt out with
+       `comments: false`. It renders on posts only.
+
+       Nothing loads from giscus.app until the reader scrolls near the thread,
+       or comes back from signing in. client.js puts its iframe in the .giscus
+       element and returns the reader to that element's id after a sign-in.
+       The widget follows the light/dark toggle. */ -}}
+{{- if eq .Section "posts" }}
+{{- with site.Params.giscus }}
+{{- if not (and .repo .repo_id .category .category_id) }}
+  {{- errorf "params.giscus in hugo.toml needs repo, repo_id, category and category_id" }}
+{{- end }}
+{{- $config := dict
+  "src" "https://giscus.app/client.js"
+  "data-repo" .repo
+  "data-repo-id" .repo_id
+  "data-category" .category
+  "data-category-id" .category_id
+  "data-mapping" "specific"
+  "data-term" (strings.TrimPrefix "/" $.Path)
+  "data-strict" "1"
+  "data-reactions-enabled" "1"
+  "data-emit-metadata" "0"
+  "data-input-position" "top"
+  "data-lang" "en"
+  "data-loading" "lazy"
+}}
+<section class="comments" aria-label="Comments">
+  <div class="giscus" id="comments"></div>
+  <noscript>The comments need JavaScript. You can also read them on <a href="https://github.com/{{ .repo }}/discussions">GitHub</a>.</noscript>
+  <script>
+    (function () {
+      var config = {{ $config }};
+      var section = document.currentScript.parentNode;
+      var html = document.documentElement;
+      function theme() {
+        return html.dataset.theme === "dark" ? "transparent_dark" : "light";
+      }
+
+      var loaded = false;
+      function load() {
+        if (loaded) return;
+        loaded = true;
+        var script = document.createElement("script");
+        for (var name in config) script.setAttribute(name, config[name]);
+        script.setAttribute("data-theme", theme());
+        script.crossOrigin = "anonymous";
+        script.async = true;
+        section.appendChild(script);
+      }
+      // Load when the thread is about a screen away, or straight away for a
+      // reader coming back from signing in (giscus adds ?giscus= to the URL).
+      if (!("IntersectionObserver" in window) || /[?&]giscus=/.test(location.search)) {
+        load();
+      } else {
+        var observer = new IntersectionObserver(function (entries) {
+          if (entries.some(function (entry) { return entry.isIntersecting; })) {
+            observer.disconnect();
+            load();
+          }
+        }, { rootMargin: "600px 0px" });
+        observer.observe(section);
+      }
+
+      // Keep the widget's theme in step with the toggle. The frame can load, or
+      // reload after a sign-out, with an older theme, so it gets the current one
+      // again the first time it messages the page after each load.
+      function sendTheme() {
+        var frame = section.querySelector("iframe.giscus-frame");
+        if (frame && frame.contentWindow) {
+          frame.contentWindow.postMessage({ giscus: { setConfig: { theme: theme() } } }, "https://giscus.app");
+        }
+      }
+      new MutationObserver(sendTheme).observe(html, { attributes: true, attributeFilter: ["data-theme"] });
+      var greeted = false;
+      section.addEventListener("load", function () { greeted = false; }, true);
+      window.addEventListener("message", function (event) {
+        if (event.origin === "https://giscus.app" && !greeted) {
+          greeted = true;
+          sendTheme();
+        }
+      });
+    })();
+  </script>
+</section>
+{{- end }}
+{{- end }}

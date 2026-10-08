@@ -127,11 +127,37 @@ make a draft" to preview the email in Buttondown instead. From a terminal:
 gh workflow run deploy.yml -f email_post=<slug> -f email_draft=true
 ```
 
-Changing a post's slug makes it look new, so it gets emailed again.
+Changing a post's slug makes it look new, so it gets emailed again, and it
+leaves the post's comment thread behind (see Comments).
 
 `python scripts/test_notify.py` runs the notifier's tests offline, against a
 stand-in for Buttondown. The deploy runs them too, before it looks for posts
 to email.
+
+## Comments
+
+Every post ends with a comment thread from [giscus](https://giscus.app). Each
+thread is a GitHub Discussion in this repo, in the Announcements category.
+Anyone can read the comments, commenting needs a GitHub sign-in, and
+moderation (editing, hiding, deleting, locking) happens on GitHub. giscus
+creates a post's thread the first time someone comments or reacts.
+
+- `layouts/_partials/comments.html` renders the widget, on posts only.
+  Nothing loads from giscus.app until the reader scrolls near the thread,
+  and the widget follows the light/dark toggle.
+- `[params.giscus]` in `hugo.toml` holds the repo and category IDs.
+- `giscus.json` lets only the live blog embed these threads. The local
+  preview shows an error where the thread would be. That's deliberate: a
+  test comment or reaction would otherwise create a real public thread, and
+  for a draft or scheduled post that thread would publish its description.
+- To turn comments off for one post, put `comments: false` in its front
+  matter. A post's thread is keyed to its path (`posts/<slug>`), so renaming
+  the folder leaves the old thread behind.
+
+The giscus GitHub App has to stay installed on this repo. Without it, the
+widget shows an error instead of the thread. giscus doesn't version its
+script, so it can't be pinned with a hash: once a reader scrolls to the
+comments, giscus.app's code runs on the page.
 
 ## API
 

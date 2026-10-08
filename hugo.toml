@@ -27,6 +27,9 @@ copyright = "© 2026 Londopy · Posts [CC BY 4.0](https://creativecommons.org/li
   ShowFullTextinRSS = true
   # Social card for pages without a cover (scripts/make_cover.py --site).
   images = ["og-image.png"]
+  # Comments under each post (layouts/_partials/comments.html, giscus below).
+  # A post can turn them off with `comments: false` in its front matter.
+  comments = true
 
 [params.label]
   icon = "favicon.svg"
@@ -41,6 +44,17 @@ copyright = "© 2026 Londopy · Posts [CC BY 4.0](https://creativecommons.org/li
 # form and the box stay hidden.
 [params.newsletter]
   buttondown = "londopy"
+
+# Comments: giscus keeps each post's thread as a GitHub Discussion in this
+# repo, in the Announcements category (only giscus and the owner can start
+# threads there; anyone signed in to GitHub can reply). The IDs come from
+# GitHub's GraphQL API. giscus finds existing threads by category name, so if
+# the category is renamed, change `category` here too.
+[params.giscus]
+  repo = "Londopy/blog"
+  repo_id = "R_kgDOUo4Ldg"
+  category = "Announcements"
+  category_id = "DIC_kwDOUo4Lds4DHX2j"
 
 [params.homeInfoParams]
   Title = "Londopy"

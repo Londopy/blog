@@ -1,0 +1,4 @@
+/* The giscus comment thread under each post (layouts/_partials/comments.html). */
+.comments {
+    margin-top: 40px;
+}
