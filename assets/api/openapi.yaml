@@ -5,7 +5,7 @@ openapi: 3.1.0
 info:
   title: Londopy Blog API
   version: 1.0.0
-  summary: Every post on londopy.github.io/blog as JSON.
+  summary: Every post on londonchowdhury.com/blog as JSON.
   description: >-
     Static, read-only files, rebuilt with the blog on every push and daily at
     17:30 UTC. No key, CORS-open. Only published posts appear; a scheduled
@@ -14,15 +14,15 @@ info:
     JSON Feed, the shields.io badges, RSS and posts.txt.
   contact:
     name: Londopy
-    url: https://londopy.github.io/blog/contact/
+    url: https://londonchowdhury.com/blog/contact/
   license:
     name: Posts CC BY 4.0, code MIT
     url: https://github.com/Londopy/blog#license
 externalDocs:
   description: Docs, with examples
-  url: https://londopy.github.io/blog/api/
+  url: https://londonchowdhury.com/blog/api/
 servers:
-  - url: https://londopy.github.io/blog
+  - url: https://londonchowdhury.com/blog
     description: GitHub Pages
 tags:
   - name: Discovery

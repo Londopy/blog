@@ -24,9 +24,9 @@ to unsubscribe. The emails are sent through
 A feed reader is an app that checks the sites you follow and gathers their new
 posts in one place, like an inbox you control. Paste this address into one:
 
-`https://londopy.github.io/blog/index.xml`
+`https://londonchowdhury.com/blog/index.xml`
 
-Or use the [JSON Feed](https://londopy.github.io/blog/api/v1/feed.json), if
+Or use the [JSON Feed](https://londonchowdhury.com/blog/api/v1/feed.json), if
 your reader prefers it. There are free readers for every platform, for example
 [NetNewsWire](https://netnewswire.com/) on iPhone and Mac,
 [Feeder](https://f-droid.org/packages/com.nononsenseapps.feeder/) on Android,

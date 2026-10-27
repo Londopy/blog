@@ -11,7 +11,7 @@ Writes into static/:
   apple-touch-icon.png         180 px, square (iOS rounds the corners itself)
   android-chrome-192x192.png, android-chrome-512x512.png   (site.webmanifest)
 
-The mark matches public/favicon.svg on londopy.github.io: ">_" in JetBrains
+The mark matches public/favicon.svg on londonchowdhury.com: ">_" in JetBrains
 Mono Bold, size 15 at x=5 on baseline 22 of a 32-unit tile. The SVGs trace
 the glyphs from the font, so they render the same on machines without it.
 Requires Pillow and fontTools.
