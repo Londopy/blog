@@ -5,13 +5,13 @@ name: Londopy Blog API
 api: londopy-blog
 version: 1.0.0
 description: >-
-  Every post on londonchowdhury.com/blog as JSON: the full text and metadata,
+  Every post on londopy.github.io/blog as JSON: the full text and metadata,
   tags, the archive, the numbers, a JSON Feed and shields.io badges. Static
   files, rebuilt with the blog on every push and every day; read-only, no key,
   CORS-open. Only published posts appear: a scheduled post shows up on its date.
 repo: https://github.com/Londopy/blog
 raw: https://raw.githubusercontent.com/Londopy/blog/main
-portfolio_api: https://londonchowdhury.com/api/
+portfolio_api: https://londopy.github.io/api/
 badge_color: d97706
 feed_items: 20
 

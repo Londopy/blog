@@ -23,9 +23,9 @@ New posts go up on Thursdays, and you can [get each one by email or RSS]({{< rel
 
 ## Elsewhere
 
-- Projects: [londonchowdhury.com](https://londonchowdhury.com/)
+- Projects: [londopy.github.io](https://londopy.github.io/)
 - Code: [github.com/Londopy](https://github.com/Londopy)
-- Feed: [RSS](https://londonchowdhury.com/blog/index.xml)
+- Feed: [RSS](https://londopy.github.io/blog/index.xml)
 - API: [every post as JSON]({{< relref "api" >}})
 - Contact: [message form, IRC, Discord]({{< relref "contact" >}})
 

@@ -15,19 +15,19 @@ Only published posts appear. A scheduled post joins the API with the build that 
 
 ```sh
 # every post, newest first
-curl -s https://londonchowdhury.com/blog/api/v1/posts.json
+curl -s https://londopy.github.io/blog/api/v1/posts.json
 
 # one post in full
-curl -s https://londonchowdhury.com/blog/api/v1/posts/gitattributes.json
+curl -s https://londopy.github.io/blog/api/v1/posts/gitattributes.json
 
 # the list, readable in a terminal
-curl -s https://londonchowdhury.com/blog/api/v1/posts.txt
+curl -s https://londopy.github.io/blog/api/v1/posts.txt
 ```
 
 From a web page:
 
 ```js
-const res = await fetch("https://londonchowdhury.com/blog/api/v1/latest.json");
+const res = await fetch("https://londopy.github.io/blog/api/v1/latest.json");
 const { data: post } = await res.json();
 console.log(post.title, post.url);
 ```
@@ -35,7 +35,7 @@ console.log(post.title, post.url);
 With [jq](https://jqlang.org/):
 
 ```sh
-curl -s https://londonchowdhury.com/blog/api/v1/posts.json |
+curl -s https://londopy.github.io/blog/api/v1/posts.json |
   jq -r '.data[] | "\(.published[:10])  \(.title)"'
 ```
 
@@ -43,11 +43,11 @@ curl -s https://londonchowdhury.com/blog/api/v1/posts.json |
 
 {{< api-endpoints >}}
 
-The same list is available as JSON at [/blog/api/v1/index.json](https://londonchowdhury.com/blog/api/v1/index.json). The whole API is described in OpenAPI 3.1 at [/blog/api/openapi.json](https://londonchowdhury.com/blog/api/openapi.json), which you can load into Swagger UI, Postman, or a client generator.
+The same list is available as JSON at [/blog/api/v1/index.json](https://londopy.github.io/blog/api/v1/index.json). The whole API is described in OpenAPI 3.1 at [/blog/api/openapi.json](https://londopy.github.io/blog/api/openapi.json), which you can load into Swagger UI, Postman, or a client generator.
 
 ## The envelope
 
-Every response wraps its payload the same way as my [portfolio's API](https://londonchowdhury.com/api/):
+Every response wraps its payload the same way as my [portfolio's API](https://londopy.github.io/api/):
 
 ```json
 {
@@ -55,8 +55,8 @@ Every response wraps its payload the same way as my [portfolio's API](https://lo
     "api": "londopy-blog",
     "version": "1.0.0",
     "generated": "2026-09-25T20:39:31Z",
-    "self": "https://londonchowdhury.com/blog/api/v1/posts.json",
-    "docs": "https://londonchowdhury.com/blog/api/"
+    "self": "https://londopy.github.io/blog/api/v1/posts.json",
+    "docs": "https://londopy.github.io/blog/api/"
   },
   "data": []
 }
@@ -100,7 +100,7 @@ The [JSON Feed](https://www.jsonfeed.org/) at `/blog/api/v1/feed.json` and the R
 The badges plug into [shields.io](https://shields.io/badges/endpoint-badge), for a README or anywhere else:
 
 ```md
-![blog posts](https://img.shields.io/endpoint?url=https://londonchowdhury.com/blog/api/v1/badges/posts.json)
+![blog posts](https://img.shields.io/endpoint?url=https://londopy.github.io/blog/api/v1/badges/posts.json)
 ```
 
 The metrics are `posts`, `words`, `latest` (the newest post's title) and `updated` (its date).
@@ -115,4 +115,4 @@ Before every deploy, [`scripts/check_api.py`](https://github.com/Londopy/blog/bl
 
 The posts are licensed [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/): quote them, translate them, or republish them, as long as you credit Londopy and link to the original post. Code in the posts is [MIT](https://github.com/Londopy/blog/blob/main/LICENSE). The whole site's source is on [GitHub](https://github.com/Londopy/blog).
 
-My [portfolio's API](https://londonchowdhury.com/api/) covers everything else on londonchowdhury.com: the projects, pull requests, and more.
+My [portfolio's API](https://londopy.github.io/api/) covers everything else on londopy.github.io: the projects, pull requests, and more.
