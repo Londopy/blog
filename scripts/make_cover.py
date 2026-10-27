@@ -2,7 +2,7 @@
 """Generate social cards (1200x630) as terminal-window cards.
 
 The window sits on the same amber topographic contours as the background of
-londopy.github.io, so the blog and the portfolio read as one site. Each
+londo.me, so the blog and the portfolio read as one site. Each
 card's terrain is seeded from its slug: different per post, identical on
 every run.
 
@@ -52,7 +52,7 @@ MANIFEST = os.path.join(ROOT, "scripts", "covers.json")
 PROMPT = [("londopy", ACCENT), ("@", FAINT), ("github", TEXT), (":~$", FAINT)]
 MAX_LINES = 5   # prompt + 4; more would push the tags out of the window
 
-# Background, after TopoBackground.astro on londopy.github.io: the same noise
+# Background, after TopoBackground.astro on londo.me: the same noise
 # octaves, 13 contour levels, amber lines at 9% with every third at 20%.
 TOPO_LEVELS = 13
 TOPO_COLS, TOPO_ROWS = 40, 21       # marching-squares cells, 30 px each
@@ -119,7 +119,7 @@ def wash(size):
 
 def topo_background(seed):
     """Contour lines traced with marching squares over three octaves of seeded
-    value noise, the way the londopy.github.io background draws them."""
+    value noise, the way the londo.me background draws them."""
     rng = random.Random(seed)
     smooth = lambda t: t * t * (3 - 2 * t)
 
@@ -196,7 +196,7 @@ def base_card(seed):
     bar = "londopy@github: ~/blog"
     d.text((PX + PW / 2 - d.textlength(bar, ft) / 2, PY + 15), bar, font=ft, fill=FAINT)
     fu = ImageFont.truetype(MONO, 22)
-    u = "londopy.github.io/blog"
+    u = "londo.me/blog"
     d.text((W / 2 - d.textlength(u, fu) / 2, 582), u, font=fu, fill=ACCENT)
     return img, d
 

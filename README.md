@@ -1,12 +1,12 @@
 # Londopy blog
 
 Notes on security, systems, radio, and building things, plus whatever else
-I'm chewing on. Live at **https://londopy.github.io/blog/**.
+I'm chewing on. Live at **https://londo.me/blog/**.
 
 Built with [Hugo](https://gohugo.io/) (extended) and the
 [PaperMod](https://github.com/adityatelange/hugo-PaperMod) theme, deployed to
 GitHub Pages by GitHub Actions. This repo is a project site, so it is served
-under `/blog/`. The root of `londopy.github.io` is the project index from
+under `/blog/`. The root of `londo.me` is the project index from
 [Londopy/londopy.github.io](https://github.com/Londopy/londopy.github.io).
 
 ## Local setup
@@ -59,7 +59,7 @@ rebuilt after a design change:
   PNGs, and `favicon.svg`, which is also the header logo), the Safari
   pinned-tab mask, the Apple touch icon, and the Android icons that
   `static/site.webmanifest` lists. They reproduce the `>_` mark from
-  londopy.github.io, traced from JetBrains Mono Bold.
+  londo.me, traced from JetBrains Mono Bold.
 - `python scripts/make_cover.py --all` writes every post's `cover.png` (using
   the lines in `scripts/covers.json`) and `static/og-image.png`, the social
   card for pages without a cover. `--site` or a single post directory
@@ -162,7 +162,7 @@ comments, giscus.app's code runs on the page.
 ## API
 
 Every post is also served as JSON under `/blog/api/v1/`, documented at
-https://londopy.github.io/blog/api/ and described in OpenAPI 3.1 at
+https://londo.me/blog/api/ and described in OpenAPI 3.1 at
 `/blog/api/openapi.json`. It's static: Hugo writes it on every build, from the
 same published pages as the site, so drafts and scheduled posts never show up
 early. The pieces:
@@ -189,7 +189,7 @@ in a new `/api/v2/`.
 The blog is the canonical home of every post. Copies on dev.to, Hashnode, or
 Medium must set their canonical URL to the post here. dev.to can import
 straight from the feed, which carries full post content:
-https://londopy.github.io/blog/index.xml
+https://londo.me/blog/index.xml
 
 ## License
 

@@ -11,7 +11,7 @@
 {{- $e := "api/envelope.html" -}}
 {{- $u := urls.Parse site.BaseURL -}}
 {{- $origin := printf "%s://%s" $u.Scheme $u.Host -}}
-{{- $author := dict "name" site.Params.author "url" "https://londopy.github.io/" -}}
+{{- $author := dict "name" site.Params.author "url" "https://londo.me/" -}}
 
 {{- /* posts: summaries for the lists, full objects for the per-post files */ -}}
 {{- $summaries := slice -}}
@@ -130,7 +130,7 @@
         "sitemap" (absURL "sitemap.xml")
         "api_docs" (absURL "api/")
         "openapi" (absURL "api/openapi.json")
-        "portfolio" "https://londopy.github.io/"
+        "portfolio" "https://londo.me/"
         "portfolio_api" $api.portfolio_api
         "github" "https://github.com/Londopy"
         "source" $api.repo)
