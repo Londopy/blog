@@ -42,5 +42,12 @@
     "ana      on scene   2 min ago",
     "luis     en route   9 min ago",
     "jordan   {overdue}  47 min ago  # report filed"
+  ],
+  "ics-attack-lab": [
+    "$ sudo tail -f /var/log/suricata/fast.log",
+    "[**] Modbus Write Single Coil (FC05)",
+    "     192.168.57.1 -> 192.168.57.10:502",
+    "[**] Modbus READ request {recon}",
+    "# byte rules: 12 false alarms. parser: 0."
   ]
 }
